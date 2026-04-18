@@ -8,6 +8,7 @@ import { ZDepthSorter } from '../systems/ZDepthSorter';
 import { CombatSystem } from '../systems/CombatSystem';
 import { ComboParser } from '../systems/ComboParser';
 import { ProjectileSystem } from '../systems/ProjectileSystem';
+import { StonePickupSystem } from '../systems/StonePickupSystem';
 import { StageHUD } from '../ui/StageHUD';
 import { VirtualDpad } from '../ui/VirtualDpad';
 import { StageManager, ALL_STAGES } from '../systems/StageManager';
@@ -23,6 +24,9 @@ export class StageScene extends Phaser.Scene {
   private comboParser!: ComboParser;
   private comboParser2!: ComboParser;
   private projectiles!: ProjectileSystem;
+  private stonePickup!: StonePickupSystem;
+  private keyStoneP1!: Phaser.Input.Keyboard.Key;
+  private keyStoneP2!: Phaser.Input.Keyboard.Key;
   private hud!: StageHUD;
   private stageManager!: StageManager;
   private virtualDpad!: VirtualDpad;
@@ -185,6 +189,14 @@ export class StageScene extends Phaser.Scene {
     this.comboParser = new ComboParser();
     this.comboParser2 = new ComboParser();
     this.projectiles = new ProjectileSystem(this);
+    this.stonePickup = new StonePickupSystem(this, this.projectiles);
+    // Spawn 3 stones per section (wave), staggered along the ground
+    for (let w = 0; w < stageConfig.waves.length; w++) {
+      const base = w * GAME_WIDTH;
+      this.stonePickup.spawnStone(base + 180, STAGE_WALKABLE_Y_MAX - 10);
+      this.stonePickup.spawnStone(base + 420, STAGE_WALKABLE_Y_MAX - 20);
+      this.stonePickup.spawnStone(base + 640, STAGE_WALKABLE_Y_MAX - 5);
+    }
     this.hud = new StageHUD(this);
 
     // P1
@@ -234,12 +246,14 @@ export class StageScene extends Phaser.Scene {
       this.keyHeavy = this.input.keyboard.addKey('K');
       this.keyJump = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
       this.keyBlock = this.input.keyboard.addKey('L');
+      this.keyStoneP1 = this.input.keyboard.addKey('H');
 
       // P2 keys: Arrows + ,/M/.//
       this.keyP2Attack = this.input.keyboard.addKey(',');
       this.keyP2Heavy = this.input.keyboard.addKey('M');
       this.keyP2Jump = this.input.keyboard.addKey('.');
       this.keyP2Block = this.input.keyboard.addKey('/');
+      this.keyStoneP2 = this.input.keyboard.addKey('B');
 
       this.keyDebug = this.input.keyboard.addKey('`');
     }
@@ -249,8 +263,8 @@ export class StageScene extends Phaser.Scene {
     }).setDepth(1000).setScrollFactor(0).setVisible(false);
 
     // Instructions
-    const p1Help = 'P1: WASD+Space+J/K/L';
-    const p2Help = this.is2P ? ' | P2: Arrows+./,+M+/' : '';
+    const p1Help = 'P1: WASD+Space+J/K/L  H=Stone';
+    const p2Help = this.is2P ? ' | P2: Arrows+./,+M+/  B=Stone' : '';
     this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 10, p1Help + p2Help, {
       fontSize: '9px', color: '#555555', fontFamily: 'monospace',
     }).setOrigin(0.5).setDepth(1000).setScrollFactor(0);
@@ -292,6 +306,7 @@ export class StageScene extends Phaser.Scene {
     this.stageManager.update(time, delta);
     this.combatSystem.update(time, delta);
     this.projectiles.update(delta, () => this.getAllCharacters());
+    this.stonePickup.update();
     this.zDepthSorter.update();
     this.hud.update(this.player, this.stageManager.aliveEnemies, this.combatSystem.getHitCounter(), delta, this.player2);
 
@@ -388,6 +403,9 @@ export class StageScene extends Phaser.Scene {
     if (Phaser.Input.Keyboard.JustUp(this.keyBlock)) {
       this.player.releaseBlock();
     }
+    if (this.keyStoneP1 && Phaser.Input.Keyboard.JustDown(this.keyStoneP1)) {
+      this.stonePickup.tryAction(this.player);
+    }
   }
 
   // --- P2 Input (Arrows + ,/M/./ / ) ---
@@ -430,6 +448,9 @@ export class StageScene extends Phaser.Scene {
     }
     if (Phaser.Input.Keyboard.JustUp(this.keyP2Block)) {
       this.player2.releaseBlock();
+    }
+    if (this.keyStoneP2 && Phaser.Input.Keyboard.JustDown(this.keyStoneP2) && this.player2) {
+      this.stonePickup.tryAction(this.player2);
     }
   }
 

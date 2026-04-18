@@ -179,29 +179,37 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
     }
   }
 
-  /** Visual startup FX for heavy / special attacks. */
-  playSpecialAttackFx(kind: 'heavy' | 'special'): void {
-    const color = kind === 'special' ? 0xff66ff : 0xffcc33;
-    // Tint the body briefly (charging glow)
-    if (this.bodySprite) {
-      this.bodySprite.setTint(color);
-      this.scene.time.delayedCall(260, () => { if (this.bodySprite) this.bodySprite.clearTint(); });
+  // Sword-light trail emitter state (active while attacking with sword-wielding fighters)
+  private swordTrailCooldown = 0;
+
+  /** Per-fighter accent color for generic startup FX. */
+  private fighterAccentColor(): number {
+    const key = String(this.stats?.fighterKey ?? '');
+    switch (key) {
+      case 'lian_jin':       return 0x66ddff; // cyan sword light (墨子劍法)
+      case 'xiang_shao_long':return 0xffcc33; // gold (跆拳 gap-closer)
+      case 'wu_ting_fang':   return 0xff88cc; // pink (agile whirl)
+      case 'shan_rou':       return 0xaa66ff; // purple (shadow daggers)
+      case 'ying_zheng':     return 0xffdd44; // imperial gold
+      default:               return 0xffcc33;
     }
-    // Expanding ring at feet
-    const ring = this.scene.add.circle(this.x, this.groundY - 4, 14, color, 0);
+  }
+
+  /** Expanding charge ring at character feet. */
+  private fxChargeRing(color: number, startR = 14, endR = 48, dur = 320): void {
+    const ring = this.scene.add.circle(this.x, this.groundY - 4, startR, color, 0);
     ring.setStrokeStyle(3, color, 0.9);
     ring.setDepth(50);
     this.scene.tweens.add({
-      targets: ring,
-      radius: 48,
-      alpha: 0,
-      duration: 320,
-      ease: 'Cubic.easeOut',
+      targets: ring, radius: endR, alpha: 0, duration: dur, ease: 'Cubic.easeOut',
       onComplete: () => ring.destroy(),
     });
-    // Rising sparks
-    for (let i = 0; i < 6; i++) {
-      const ang = (Math.PI * 2 * i) / 6 + Math.random() * 0.3;
+  }
+
+  /** Radial sparks at character feet. */
+  private fxRadialSparks(color: number, count = 6, dist = 26): void {
+    for (let i = 0; i < count; i++) {
+      const ang = (Math.PI * 2 * i) / count + Math.random() * 0.3;
       const spark = this.scene.add.rectangle(
         this.x + Math.cos(ang) * 14,
         this.groundY - 8 + Math.sin(ang) * 4,
@@ -210,18 +218,174 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
       spark.setDepth(51);
       this.scene.tweens.add({
         targets: spark,
-        x: spark.x + Math.cos(ang) * 26,
+        x: spark.x + Math.cos(ang) * dist,
         y: spark.y - 18 - Math.random() * 10,
-        alpha: 0,
-        duration: 280,
-        ease: 'Quad.easeOut',
+        alpha: 0, duration: 280, ease: 'Quad.easeOut',
         onComplete: () => spark.destroy(),
       });
     }
-    // Slight camera punch for specials only
-    if (kind === 'special') {
+  }
+
+  /** Spawn a single sword-light streak ahead of the character (used by LianJin sword trail). */
+  private fxSwordStreak(): void {
+    const dir = this.facing === Direction.Right ? 1 : -1;
+    const cx = this.x + 26 * dir;
+    const cy = this.groundY - (this.stats?.height ?? 46) * 0.55;
+    const streak = this.scene.add.rectangle(cx, cy, 28, 4, 0x99eeff, 0.9);
+    streak.setOrigin(0.5, 0.5);
+    streak.rotation = -0.35 * dir;
+    streak.setDepth(this.groundY + 3);
+    this.scene.tweens.add({
+      targets: streak, scaleX: 2.0, scaleY: 0.4, alpha: 0,
+      duration: 180, ease: 'Quad.easeOut',
+      onComplete: () => streak.destroy(),
+    });
+    // core glow
+    const glow = this.scene.add.circle(cx, cy, 6, 0xffffff, 0.9);
+    glow.setDepth(this.groundY + 4);
+    this.scene.tweens.add({
+      targets: glow, radius: 2, alpha: 0, duration: 160,
+      onComplete: () => glow.destroy(),
+    });
+  }
+
+  /** Vertical light pillar for anti-air / uppercut. */
+  private fxUppercutPillar(color: number): void {
+    const pillar = this.scene.add.rectangle(this.x, this.groundY - 40, 18, 120, color, 0.6);
+    pillar.setDepth(this.groundY + 2);
+    this.scene.tweens.add({
+      targets: pillar, scaleY: 1.6, alpha: 0, y: pillar.y - 40,
+      duration: 320, ease: 'Cubic.easeOut',
+      onComplete: () => pillar.destroy(),
+    });
+  }
+
+  /** Horizontal shockwave used for sweep/sword-wave. */
+  private fxShockwaveHoriz(color: number): void {
+    const dir = this.facing === Direction.Right ? 1 : -1;
+    const bar = this.scene.add.rectangle(this.x + 30 * dir, this.groundY - 20, 18, 10, color, 0.8);
+    bar.setDepth(this.groundY + 2);
+    this.scene.tweens.add({
+      targets: bar, scaleX: 8, alpha: 0, x: bar.x + 120 * dir,
+      duration: 280, ease: 'Cubic.easeOut',
+      onComplete: () => bar.destroy(),
+    });
+  }
+
+  /** Dark teleport puff for backstab. */
+  private fxShadowPuff(): void {
+    for (let i = 0; i < 10; i++) {
+      const puff = this.scene.add.circle(
+        this.x + (Math.random() - 0.5) * 30,
+        this.groundY - 20 - Math.random() * 30,
+        6 + Math.random() * 4, 0x442266, 0.8,
+      );
+      puff.setDepth(this.groundY + 2);
+      this.scene.tweens.add({
+        targets: puff, radius: 14, alpha: 0,
+        duration: 360, ease: 'Quad.easeOut',
+        onComplete: () => puff.destroy(),
+      });
+    }
+  }
+
+  /** Imperial golden aura (YingZheng specials). */
+  private fxImperialAura(): void {
+    const aura = this.scene.add.circle(this.x, this.groundY - 24, 30, 0xffdd44, 0.35);
+    aura.setDepth(this.groundY + 1);
+    aura.setStrokeStyle(2, 0xffee88, 0.9);
+    this.scene.tweens.add({
+      targets: aura, radius: 70, alpha: 0,
+      duration: 500, ease: 'Cubic.easeOut',
+      onComplete: () => aura.destroy(),
+    });
+  }
+
+  /**
+   * Visual startup FX for heavy / special attacks.
+   * moveName lets us pick a move-specific effect in addition to the base flourish.
+   */
+  playSpecialAttackFx(kind: 'heavy' | 'special', moveName?: string): void {
+    const accent = this.fighterAccentColor();
+    const color = kind === 'heavy' ? 0xffcc33 : accent;
+
+    // Body tint pulse
+    if (this.bodySprite) {
+      this.bodySprite.setTint(color);
+      this.scene.time.delayedCall(260, () => { if (this.bodySprite) this.bodySprite.clearTint(); });
+    }
+    this.fxChargeRing(color);
+    this.fxRadialSparks(color);
+
+    // Move-specific flourish
+    switch (moveName) {
+      case 'uppercut':
+        this.fxUppercutPillar(0xffee88);
+        break;
+      case 'sweep_stomp':
+        this.fxShockwaveHoriz(0xff9933);
+        this.scene.cameras.main.shake(120, 0.006);
+        break;
+      case 'sword_wave':
+        this.fxShockwaveHoriz(0x66ddff);
+        this.fxSwordStreak();
+        break;
+      case 'phantom_step':
+      case 'counter':
+        // 墨子劍法 flash — triple sword streak
+        for (let i = 0; i < 3; i++) {
+          this.scene.time.delayedCall(40 * i, () => this.fxSwordStreak());
+        }
+        break;
+      case 'backstab':
+        this.fxShadowPuff();
+        break;
+      case 'dagger_throw':
+        this.fxShockwaveHoriz(0xaa66ff);
+        break;
+      case 'bleed_combo':
+      case 'whirl':
+        // fast spinning ring
+        this.fxChargeRing(color, 10, 40, 240);
+        this.fxChargeRing(color, 14, 52, 320);
+        break;
+      case 'king_charge':
+      case 'imperial_palm':
+        this.fxImperialAura();
+        this.scene.cameras.main.shake(120, 0.006);
+        break;
+      case 'flying_knee':
+        this.fxShockwaveHoriz(0xffcc33);
+        break;
+      case 'super':
+        this.scene.cameras.main.shake(200, 0.012);
+        this.scene.cameras.main.flash(180, 255, 240, 180);
+        this.fxChargeRing(color, 20, 80, 500);
+        break;
+      default:
+        break;
+    }
+
+    if (kind === 'special' && moveName !== 'super') {
       this.scene.cameras.main.shake(80, 0.004);
       this.scene.cameras.main.flash(90, 255, 200, 255);
+    }
+  }
+
+  /** Emit sword-trail streaks during active attack frames (called each tick for sword fighters). */
+  protected updateSwordTrail(delta: number): void {
+    const key = String(this.stats?.fighterKey ?? '');
+    const sword = key === 'lian_jin'; // 墨子劍法 glows while sword moves
+    if (!sword) return;
+    if (this.stateMachine.currentState !== CharacterState.Attack) {
+      this.swordTrailCooldown = 0;
+      return;
+    }
+    if (!this.isHitboxActive) return;
+    this.swordTrailCooldown -= delta;
+    if (this.swordTrailCooldown <= 0) {
+      this.swordTrailCooldown = 55; // emit streak ~18 Hz
+      this.fxSwordStreak();
     }
   }
 
@@ -357,6 +521,7 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
       this.setAlpha(0.5);
     }
 
+    this.updateSwordTrail(delta);
     this.updateVisuals();
   }
 

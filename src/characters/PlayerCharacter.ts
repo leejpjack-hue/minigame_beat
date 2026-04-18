@@ -174,7 +174,7 @@ export class PlayerCharacter extends BaseCharacter {
       travel: move.travel,
       teleportBehind: move.teleportBehind,
     });
-    if (started) this.playSpecialAttackFx('special');
+    if (started) this.playSpecialAttackFx('special', action);
   }
 
   /**
