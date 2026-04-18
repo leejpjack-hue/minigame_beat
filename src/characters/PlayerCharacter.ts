@@ -129,10 +129,11 @@ export class PlayerCharacter extends BaseCharacter {
   performHeavy(): void {
     const moves = getFighterMoves(String(this.stats.fighterKey));
     if (!moves) return;
-    this.startAttack('heavy', moves.heavyFrames, {
+    const started = this.startAttack('heavy', moves.heavyFrames, {
       activeStart: moves.heavy.activeStart,
       activeEnd: moves.heavy.activeEnd,
     });
+    if (started) this.playSpecialAttackFx('heavy');
   }
 
   /** Dispatch special-move name keyed per fighter */
@@ -166,13 +167,14 @@ export class PlayerCharacter extends BaseCharacter {
     }
 
     const frames = moves.specialFrames[action] ?? 500;
-    this.startAttack(action, frames, {
+    const started = this.startAttack(action, frames, {
       activeStart: move.activeStart,
       activeEnd: move.activeEnd,
       superArmor: move.superArmor,
       travel: move.travel,
       teleportBehind: move.teleportBehind,
     });
+    if (started) this.playSpecialAttackFx('special');
   }
 
   /**

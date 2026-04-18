@@ -63,7 +63,17 @@ export class StageScene extends Phaser.Scene {
 
     this.gameOver = false;
     this.currentStageIndex = data?.stageIndex ?? this.registry.get('currentStage') ?? 0;
-    this.is2P = !!(data?.fighterP2);
+
+    // Persist fighters across scene restarts (stage-to-stage transitions)
+    const storedP1 = this.registry.get('fighterP1') as FighterStats | undefined;
+    const storedP2 = this.registry.get('fighterP2') as FighterStats | undefined;
+    const incomingP1 = data?.fighterP1 ?? data?.fighter;
+    const incomingP2 = data?.fighterP2;
+    if (incomingP1) this.registry.set('fighterP1', incomingP1);
+    if (incomingP2) this.registry.set('fighterP2', incomingP2);
+    const effectiveP1 = incomingP1 ?? storedP1;
+    const effectiveP2 = incomingP2 ?? storedP2;
+    this.is2P = !!effectiveP2;
     this.player2 = null;
 
     // Play stage bgm
@@ -141,15 +151,15 @@ export class StageScene extends Phaser.Scene {
     this.hud = new StageHUD(this);
 
     // P1
-    const p1Stats: FighterStats = data?.fighterP1 ?? data?.fighter ?? XiangShaoLongStats;
+    const p1Stats: FighterStats = effectiveP1 ?? XiangShaoLongStats;
     this.player = new PlayerCharacter(this, 150, 340, p1Stats);
     this.zDepthSorter.addCharacter(this.player);
     this.combatSystem.addCharacter(this.player);
     this.hud.initPlayerHUD(this.player, 'P1');
 
     // P2
-    if (this.is2P && data?.fighterP2) {
-      this.player2 = new PlayerCharacter(this, 200, 340, data.fighterP2);
+    if (this.is2P && effectiveP2) {
+      this.player2 = new PlayerCharacter(this, 200, 340, effectiveP2);
       this.zDepthSorter.addCharacter(this.player2);
       this.combatSystem.addCharacter(this.player2);
       this.hud.initPlayerHUD(this.player2, 'P2');

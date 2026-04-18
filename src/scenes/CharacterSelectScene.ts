@@ -178,6 +178,7 @@ export class CharacterSelectScene extends Phaser.Scene {
     } else {
       this.registry.remove('selectedFighterP2');
       this.registry.remove('gameMode');
+      this.registry.remove('fighterP2');  // clear stale 2P cache from previous run
       this.scene.start(SceneKeys.Stage, { fighter: p1 });
     }
   }

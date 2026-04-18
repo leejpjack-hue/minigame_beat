@@ -28,7 +28,7 @@ export const ENEMY_TYPES: Record<EnemyTypeId, EnemyTypeDef> = {
   soldier: {
     id: 'soldier',
     nameZH: '兵',
-    stats: { maxHp: 200, attackPower: 12, speed: 140, width: 30, height: 46 },
+    stats: { maxHp: 200, attackPower: 12, speed: 140, width: 30, height: 46, defensePower: 2 },
     aiPersonality: 'normal',
     spriteKey: 'sprite_enemy_soldier',
     attackName: 'enemy_slash',
@@ -38,7 +38,7 @@ export const ENEMY_TYPES: Record<EnemyTypeId, EnemyTypeDef> = {
   archer: {
     id: 'archer',
     nameZH: '弓兵',
-    stats: { maxHp: 150, attackPower: 10, speed: 130, width: 28, height: 44 },
+    stats: { maxHp: 150, attackPower: 10, speed: 130, width: 28, height: 44, defensePower: 0 },
     aiPersonality: 'archer',
     spriteKey: 'sprite_enemy_archer',
     attackName: 'enemy_arrow',
@@ -49,7 +49,7 @@ export const ENEMY_TYPES: Record<EnemyTypeId, EnemyTypeDef> = {
   spearman: {
     id: 'spearman',
     nameZH: '矛兵',
-    stats: { maxHp: 300, attackPower: 18, speed: 130, width: 32, height: 48 },
+    stats: { maxHp: 300, attackPower: 18, speed: 130, width: 32, height: 48, defensePower: 5 },
     aiPersonality: 'spearman',
     spriteKey: 'sprite_enemy_spearman',
     attackName: 'enemy_thrust',
@@ -69,7 +69,7 @@ export const ENEMY_TYPES: Record<EnemyTypeId, EnemyTypeDef> = {
   cavalry: {
     id: 'cavalry',
     nameZH: '騎兵',
-    stats: { maxHp: 350, attackPower: 25, speed: 260, width: 40, height: 54 },
+    stats: { maxHp: 350, attackPower: 25, speed: 260, width: 40, height: 54, defensePower: 8 },
     aiPersonality: 'cavalry',
     spriteKey: 'sprite_enemy_cavalry',
     attackName: 'enemy_charge',
@@ -79,7 +79,7 @@ export const ENEMY_TYPES: Record<EnemyTypeId, EnemyTypeDef> = {
   elite: {
     id: 'elite',
     nameZH: '精兵',
-    stats: { maxHp: 500, attackPower: 28, speed: 160, width: 32, height: 48 },
+    stats: { maxHp: 500, attackPower: 28, speed: 160, width: 32, height: 48, defensePower: 12 },
     aiPersonality: 'elite',
     spriteKey: 'sprite_enemy_elite',
     attackName: 'enemy_heavy',
@@ -89,7 +89,7 @@ export const ENEMY_TYPES: Record<EnemyTypeId, EnemyTypeDef> = {
   boss: {
     id: 'boss',
     nameZH: '將軍',
-    stats: { maxHp: 1200, attackPower: 40, speed: 140, width: 40, height: 56 },
+    stats: { maxHp: 1200, attackPower: 40, speed: 140, width: 40, height: 56, defensePower: 20 },
     aiPersonality: 'boss',
     spriteKey: 'sprite_enemy_general',
     attackName: 'enemy_heavy',
@@ -99,7 +99,7 @@ export const ENEMY_TYPES: Record<EnemyTypeId, EnemyTypeDef> = {
   miniboss_lj: {
     id: 'miniboss_lj',
     nameZH: '管中邪',
-    stats: { maxHp: 1000, attackPower: 30, speed: 210, width: 34, height: 50 },
+    stats: { maxHp: 1000, attackPower: 30, speed: 210, width: 34, height: 50, defensePower: 15 },
     aiPersonality: 'miniboss_lj',
     spriteKey: 'sprite_enemy_minilj',
     attackName: 'enemy_heavy',
@@ -109,7 +109,7 @@ export const ENEMY_TYPES: Record<EnemyTypeId, EnemyTypeDef> = {
   miniboss_tx: {
     id: 'miniboss_tx',
     nameZH: '圖先',
-    stats: { maxHp: 1200, attackPower: 35, speed: 150, width: 36, height: 54 },
+    stats: { maxHp: 1200, attackPower: 35, speed: 150, width: 36, height: 54, defensePower: 18 },
     aiPersonality: 'miniboss_tx',
     spriteKey: 'sprite_enemy_minitx',
     attackName: 'enemy_thrust',
@@ -119,7 +119,7 @@ export const ENEMY_TYPES: Record<EnemyTypeId, EnemyTypeDef> = {
   boss_lao: {
     id: 'boss_lao',
     nameZH: '嫪毐',
-    stats: { maxHp: 2000, attackPower: 40, speed: 130, width: 44, height: 60 },
+    stats: { maxHp: 2000, attackPower: 40, speed: 130, width: 44, height: 60, defensePower: 25 },
     aiPersonality: 'boss',
     spriteKey: 'sprite_boss_lao',
     attackName: 'boss_slam',

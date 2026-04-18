@@ -197,6 +197,17 @@ export class StageManager {
     for (const enemy of this.enemies) if (enemy.isAlive) enemy.update(time, delta);
     for (const ai of this.aiControllers) ai.update(time, delta);
 
+    // Clamp alive enemies to current section so knockback can't fling them off-stage
+    if (this.currentWave > 0) {
+      const sectionLeft = (this.currentWave - 1) * this.sectionWidth;
+      const sectionRight = this.currentWave * this.sectionWidth - 10;
+      for (const enemy of this.enemies) {
+        if (!enemy.isAlive) continue;
+        if (enemy.x < sectionLeft) { enemy.x = sectionLeft; enemy.knockbackX = 0; }
+        else if (enemy.x > sectionRight) { enemy.x = sectionRight; enemy.knockbackX = 0; }
+      }
+    }
+
     if (this.stageComplete || this.currentWave <= 0) return;
 
     // Wave just cleared

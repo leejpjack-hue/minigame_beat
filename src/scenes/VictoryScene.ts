@@ -56,11 +56,15 @@ export class VictoryScene extends Phaser.Scene {
 
     this.input.keyboard?.on('keydown-ENTER', () => {
       this.registry.remove('currentStage');
+      this.registry.remove('fighterP1');
+      this.registry.remove('fighterP2');
       this.scene.start(SceneKeys.CharacterSelect);
     });
 
     this.input.on('pointerdown', () => {
       this.registry.remove('currentStage');
+      this.registry.remove('fighterP1');
+      this.registry.remove('fighterP2');
       this.scene.start(SceneKeys.CharacterSelect);
     });
   }

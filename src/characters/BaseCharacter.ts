@@ -179,6 +179,52 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
     }
   }
 
+  /** Visual startup FX for heavy / special attacks. */
+  playSpecialAttackFx(kind: 'heavy' | 'special'): void {
+    const color = kind === 'special' ? 0xff66ff : 0xffcc33;
+    // Tint the body briefly (charging glow)
+    if (this.bodySprite) {
+      this.bodySprite.setTint(color);
+      this.scene.time.delayedCall(260, () => { if (this.bodySprite) this.bodySprite.clearTint(); });
+    }
+    // Expanding ring at feet
+    const ring = this.scene.add.circle(this.x, this.groundY - 4, 14, color, 0);
+    ring.setStrokeStyle(3, color, 0.9);
+    ring.setDepth(50);
+    this.scene.tweens.add({
+      targets: ring,
+      radius: 48,
+      alpha: 0,
+      duration: 320,
+      ease: 'Cubic.easeOut',
+      onComplete: () => ring.destroy(),
+    });
+    // Rising sparks
+    for (let i = 0; i < 6; i++) {
+      const ang = (Math.PI * 2 * i) / 6 + Math.random() * 0.3;
+      const spark = this.scene.add.rectangle(
+        this.x + Math.cos(ang) * 14,
+        this.groundY - 8 + Math.sin(ang) * 4,
+        4, 4, color,
+      );
+      spark.setDepth(51);
+      this.scene.tweens.add({
+        targets: spark,
+        x: spark.x + Math.cos(ang) * 26,
+        y: spark.y - 18 - Math.random() * 10,
+        alpha: 0,
+        duration: 280,
+        ease: 'Quad.easeOut',
+        onComplete: () => spark.destroy(),
+      });
+    }
+    // Slight camera punch for specials only
+    if (kind === 'special') {
+      this.scene.cameras.main.shake(80, 0.004);
+      this.scene.cameras.main.flash(90, 255, 200, 255);
+    }
+  }
+
   startAttack(attackName: string, totalFrames: number, options?: {
     activeStart?: number;
     activeEnd?: number;
