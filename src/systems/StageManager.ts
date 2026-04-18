@@ -135,7 +135,10 @@ export class StageManager {
   private combatSystem: CombatSystem;
   private projectiles: ProjectileSystem;
   private waveText!: Phaser.GameObjects.Text;
+  private advancePrompt!: Phaser.GameObjects.Text;
   private stageComplete = false;
+  private waveCleared = false;
+  private readonly sectionWidth = GAME_WIDTH;
 
   constructor(
     scene: Phaser.Scene,
@@ -154,7 +157,16 @@ export class StageManager {
 
     this.waveText = scene.add.text(GAME_WIDTH / 2, 120, '', {
       fontSize: '24px', fontFamily: 'monospace', color: '#ffdd00', stroke: '#000', strokeThickness: 3,
-    }).setOrigin(0.5).setDepth(1000);
+    }).setOrigin(0.5).setDepth(1000).setScrollFactor(0);
+
+    this.advancePrompt = scene.add.text(GAME_WIDTH - 60, GAME_HEIGHT / 2 - 40, 'GO →', {
+      fontSize: '32px', fontFamily: 'monospace', color: '#ffff00', stroke: '#000', strokeThickness: 4,
+    }).setOrigin(0.5).setDepth(1001).setScrollFactor(0).setVisible(false);
+
+    scene.tweens.add({
+      targets: this.advancePrompt, x: GAME_WIDTH - 30,
+      duration: 450, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+    });
   }
 
   startFirstWave(): void { this.spawnWave(0); }
@@ -165,18 +177,47 @@ export class StageManager {
     return this.enemies.filter((e) => e.isAlive);
   }
 
+  /** World width spanning all sections of this stage. */
+  get stageWidth(): number {
+    return this.config.waves.length * this.sectionWidth;
+  }
+
+  /** Right-edge gate for current wave; player cannot cross while wave is active. */
+  get sectionGateX(): number {
+    const section = Math.max(0, this.currentWave - 1);
+    return (section + 1) * this.sectionWidth - 20;
+  }
+
+  /** True while current wave is still active (enemies alive) — players are locked to current section. */
+  get isLocked(): boolean {
+    return !this.waveCleared && !this.stageComplete && this.currentWave > 0;
+  }
+
   update(time: number, delta: number): void {
     for (const enemy of this.enemies) if (enemy.isAlive) enemy.update(time, delta);
     for (const ai of this.aiControllers) ai.update(time, delta);
 
-    if (!this.stageComplete && this.currentWave > 0) {
-      if (this.aliveEnemies.length === 0) {
-        if (this.currentWave >= this.config.waves.length) {
-          this.stageComplete = true;
-          this.showStageComplete();
-        } else {
-          this.scene.time.delayedCall(1500, () => this.spawnWave(this.currentWave));
-        }
+    if (this.stageComplete || this.currentWave <= 0) return;
+
+    // Wave just cleared
+    if (!this.waveCleared && this.aliveEnemies.length === 0) {
+      this.waveCleared = true;
+      if (this.currentWave >= this.config.waves.length) {
+        this.stageComplete = true;
+        this.showStageComplete();
+      } else {
+        this.advancePrompt.setVisible(true);
+      }
+    }
+
+    // Any alive player walked far enough into the next section → spawn next wave
+    if (this.waveCleared && this.currentWave < this.config.waves.length) {
+      const triggerX = this.currentWave * this.sectionWidth + 80;
+      const crossed = this.players.some((p) => p.isAlive && p.x >= triggerX);
+      if (crossed) {
+        this.advancePrompt.setVisible(false);
+        this.waveCleared = false;
+        this.spawnWave(this.currentWave);
       }
     }
   }
@@ -185,6 +226,7 @@ export class StageManager {
     if (waveIndex >= this.config.waves.length) return;
     this.currentWave = waveIndex + 1;
     const wave = this.config.waves[waveIndex];
+    const baseX = waveIndex * this.sectionWidth;
 
     this.scene.sound.play('ui_wave_start');
     this.waveText.setText(`Wave ${this.currentWave}/${this.config.waves.length}`);
@@ -194,13 +236,14 @@ export class StageManager {
     for (const enemyDef of wave.enemies) {
       const typeDef = ENEMY_TYPES[enemyDef.type];
       const stats = { ...typeDef.stats, ...enemyDef.stats };
+      const worldX = baseX + enemyDef.x;
       let enemy: EnemyCharacter;
       if (enemyDef.type === 'boss_lao') {
-        enemy = new BossCharacter(this.scene, enemyDef.x, enemyDef.groundY, stats, typeDef, {
+        enemy = new BossCharacter(this.scene, worldX, enemyDef.groundY, stats, typeDef, {
           onSpawnAdd: (x, y) => this.spawnAdd(x, y),
         });
       } else {
-        enemy = new EnemyCharacter(this.scene, enemyDef.x, enemyDef.groundY, stats, typeDef);
+        enemy = new EnemyCharacter(this.scene, worldX, enemyDef.groundY, stats, typeDef);
       }
 
       enemy.onProjectile = (att) => {
@@ -236,9 +279,10 @@ export class StageManager {
   }
 
   private showStageComplete(): void {
-    const text = this.scene.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'STAGE CLEAR!', {
+    const cam = this.scene.cameras.main;
+    const text = this.scene.add.text(cam.scrollX + GAME_WIDTH / 2, GAME_HEIGHT / 2, 'STAGE CLEAR!', {
       fontSize: '40px', fontFamily: 'monospace', color: '#ffdd00', stroke: '#000', strokeThickness: 5,
-    }).setOrigin(0.5).setDepth(2000);
+    }).setOrigin(0.5).setDepth(2000).setScrollFactor(0);
 
     this.scene.tweens.add({
       targets: text, scale: 1.2, duration: 500, yoyo: true, repeat: 3,
@@ -271,5 +315,5 @@ export class StageManager {
     return best;
   }
 
-  destroy(): void { this.waveText?.destroy(); }
+  destroy(): void { this.waveText?.destroy(); this.advancePrompt?.destroy(); }
 }

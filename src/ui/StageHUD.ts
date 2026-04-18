@@ -34,14 +34,14 @@ export class StageHUD {
       this.playerLabel = this.scene.add.text(20, labelY, `[P1] ${char.stats.nameZH}`, {
         fontSize: '12px', color: tagColor, fontFamily: 'monospace',
         stroke: '#000', strokeThickness: 2,
-      }).setDepth(900);
+      }).setDepth(900).setScrollFactor(0);
     } else {
       this.player2HpBar = new HealthBar(this.scene, 20, yOff, 200, 14, char.maxHp);
       this.player2MpBar = new MPBar(this.scene, 20, yOff + 22, 160, 10, char.maxMp);
       this.player2Label = this.scene.add.text(20, labelY, `[P2] ${char.stats.nameZH}`, {
         fontSize: '12px', color: tagColor, fontFamily: 'monospace',
         stroke: '#000', strokeThickness: 2,
-      }).setDepth(900);
+      }).setDepth(900).setScrollFactor(0);
     }
   }
 

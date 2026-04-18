@@ -29,6 +29,7 @@ export class StageScene extends Phaser.Scene {
   private touchDx = 0;
   private touchDy = 0;
   private currentStageIndex = 0;
+  private cameraTracker!: Phaser.GameObjects.Zone;
 
   // P1 keys
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -76,22 +77,34 @@ export class StageScene extends Phaser.Scene {
     const skyColor = '#' + stageConfig.skyColor.toString(16).padStart(6, '0');
     this.cameras.main.setBackgroundColor(skyColor);
 
+    // Full stage width spans all sections (one per wave)
+    const stageWidth = stageConfig.waves.length * GAME_WIDTH;
+
+    // Floor across full stage
     const floor = this.add.graphics();
     floor.fillStyle(stageConfig.groundColor, 1);
-    floor.fillRect(0, STAGE_WALKABLE_Y_MIN, GAME_WIDTH, STAGE_WALKABLE_Y_MAX - STAGE_WALKABLE_Y_MIN + 30);
+    floor.fillRect(0, STAGE_WALKABLE_Y_MIN, stageWidth, STAGE_WALKABLE_Y_MAX - STAGE_WALKABLE_Y_MIN + 30);
     floor.lineStyle(1, stageConfig.accentColor, 0.5);
     for (let y = STAGE_WALKABLE_Y_MIN; y <= STAGE_WALKABLE_Y_MAX; y += 20) {
-      floor.beginPath(); floor.moveTo(0, y); floor.lineTo(GAME_WIDTH, y); floor.strokePath();
+      floor.beginPath(); floor.moveTo(0, y); floor.lineTo(stageWidth, y); floor.strokePath();
+    }
+    // Section divider posts (subtle pillars between waves)
+    for (let i = 1; i < stageConfig.waves.length; i++) {
+      const px = i * GAME_WIDTH;
+      floor.fillStyle(stageConfig.accentColor, 0.6);
+      floor.fillRect(px - 3, STAGE_WALKABLE_Y_MIN - 60, 6, 60);
     }
 
+    // Sky across full stage
     const sky = this.add.graphics();
     sky.fillStyle(stageConfig.skyColor, 1);
-    sky.fillRect(0, 0, GAME_WIDTH, STAGE_WALKABLE_Y_MIN);
+    sky.fillRect(0, 0, stageWidth, STAGE_WALKABLE_Y_MIN);
     sky.setDepth(-10);
 
+    // Stage title pinned to viewport
     this.add.text(GAME_WIDTH / 2, STAGE_WALKABLE_Y_MIN - 15, `${stageConfig.nameZH} - ${stageConfig.name}`, {
       fontSize: '14px', color: '#888888', fontFamily: 'monospace',
-    }).setOrigin(0.5).setDepth(-5);
+    }).setOrigin(0.5).setDepth(-5).setScrollFactor(0);
 
     // Systems
     this.zDepthSorter = new ZDepthSorter();
@@ -121,6 +134,11 @@ export class StageScene extends Phaser.Scene {
 
     this.stageManager = new StageManager(this, stageConfig, players, this.zDepthSorter, this.combatSystem, this.projectiles);
     this.stageManager.startFirstWave();
+
+    // Camera: bounds span full stage, follow invisible tracker = midpoint of alive players
+    this.cameras.main.setBounds(0, 0, stageWidth, GAME_HEIGHT);
+    this.cameraTracker = this.add.zone(this.player.x, GAME_HEIGHT / 2, 1, 1);
+    this.cameras.main.startFollow(this.cameraTracker, true, 0.12, 0);
 
     // Virtual D-pad (P1 only)
     this.virtualDpad = new VirtualDpad(this);
@@ -162,7 +180,7 @@ export class StageScene extends Phaser.Scene {
     const p2Help = this.is2P ? ' | P2: Arrows+./,+M+/' : '';
     this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 10, p1Help + p2Help, {
       fontSize: '9px', color: '#555555', fontFamily: 'monospace',
-    }).setOrigin(0.5).setDepth(1000);
+    }).setOrigin(0.5).setDepth(1000).setScrollFactor(0);
   }
 
   update(time: number, delta: number): void {
@@ -173,13 +191,14 @@ export class StageScene extends Phaser.Scene {
     const p2Dead = !this.player2 || !this.player2.isAlive;
     if (p1Dead && p2Dead) {
       this.gameOver = true;
-      this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.6).setDepth(2000);
-      this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 20, 'GAME OVER', {
+      const cam = this.cameras.main;
+      this.add.rectangle(cam.scrollX + GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.6).setDepth(2000).setScrollFactor(0);
+      this.add.text(cam.scrollX + GAME_WIDTH / 2, GAME_HEIGHT / 2 - 20, 'GAME OVER', {
         fontSize: '36px', color: '#ff0000', fontFamily: 'monospace', stroke: '#000', strokeThickness: 4,
-      }).setOrigin(0.5).setDepth(2001);
-      this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2 + 30, 'Press R to restart', {
+      }).setOrigin(0.5).setDepth(2001).setScrollFactor(0);
+      this.add.text(cam.scrollX + GAME_WIDTH / 2, GAME_HEIGHT / 2 + 30, 'Press R to restart', {
         fontSize: '16px', color: '#ffffff', fontFamily: 'monospace',
-      }).setOrigin(0.5).setDepth(2001);
+      }).setOrigin(0.5).setDepth(2001).setScrollFactor(0);
       this.input.keyboard?.on('keydown-R', () => {
         this.registry.set('currentStage', this.currentStageIndex);
         this.scene.restart();
@@ -203,6 +222,24 @@ export class StageScene extends Phaser.Scene {
     this.zDepthSorter.update();
     this.hud.update(this.player, this.stageManager.aliveEnemies, this.combatSystem.getHitCounter(), delta, this.player2);
 
+    // Clamp players: cannot walk past the section gate while a wave is active, and cannot leave stage bounds
+    const stageWidth = this.stageManager.stageWidth;
+    const gate = this.stageManager.sectionGateX;
+    const locked = this.stageManager.isLocked;
+    const cam = this.cameras.main;
+    const leftBound = Math.max(0, cam.scrollX - 20); // can't walk backward off-camera
+    this.clampPlayer(this.player, leftBound, locked ? gate : stageWidth - 20);
+    if (this.player2 && this.player2.isAlive) {
+      this.clampPlayer(this.player2, leftBound, locked ? gate : stageWidth - 20);
+    }
+
+    // Update camera tracker: midpoint between alive players, clamped to camera bounds
+    const alive = this.player2 && this.player2.isAlive ? [this.player, this.player2] : [this.player];
+    const aliveP = alive.filter((p) => p.isAlive);
+    const list = aliveP.length ? aliveP : [this.player];
+    const avgX = list.reduce((s, p) => s + p.x, 0) / list.length;
+    this.cameraTracker.x = avgX;
+
     if (this.stageManager.isStageComplete) {
       this.gameOver = true;
       this.time.delayedCall(3000, () => {
@@ -222,6 +259,11 @@ export class StageScene extends Phaser.Scene {
       if (this.showDebug) this.combatSystem.enableDebug();
     }
     this.updateDebugText();
+  }
+
+  private clampPlayer(p: BaseCharacter, minX: number, maxX: number): void {
+    if (p.x < minX) p.x = minX;
+    if (p.x > maxX) p.x = maxX;
   }
 
   private getAllCharacters(): BaseCharacter[] {

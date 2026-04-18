@@ -17,7 +17,7 @@ export class ComboIndicator {
       color: '#ffdd00',
       stroke: '#000',
       strokeThickness: 4,
-    }).setOrigin(0.5).setDepth(1000).setAlpha(0);
+    }).setOrigin(0.5).setDepth(1000).setScrollFactor(0).setAlpha(0);
   }
 
   registerHit(): number {

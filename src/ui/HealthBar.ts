@@ -22,15 +22,15 @@ export class HealthBar {
     this.maxHp = maxHp;
     this.currentHp = maxHp;
 
-    this.bg = scene.add.graphics().setDepth(900);
-    this.delayFill = scene.add.graphics().setDepth(901);
-    this.fill = scene.add.graphics().setDepth(902);
+    this.bg = scene.add.graphics().setDepth(900).setScrollFactor(0);
+    this.delayFill = scene.add.graphics().setDepth(901).setScrollFactor(0);
+    this.fill = scene.add.graphics().setDepth(902).setScrollFactor(0);
 
     this.label = scene.add.text(x, y - 14, '', {
       fontSize: '10px',
       color: '#ffffff',
       fontFamily: 'monospace',
-    }).setDepth(903);
+    }).setDepth(903).setScrollFactor(0);
 
     this.draw();
   }

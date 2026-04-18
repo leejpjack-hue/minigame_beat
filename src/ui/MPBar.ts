@@ -21,14 +21,14 @@ export class MPBar {
     this.maxMp = maxMp;
     this.currentMp = maxMp;
 
-    this.bg = scene.add.graphics().setDepth(900);
-    this.fill = scene.add.graphics().setDepth(902);
+    this.bg = scene.add.graphics().setDepth(900).setScrollFactor(0);
+    this.fill = scene.add.graphics().setDepth(902).setScrollFactor(0);
 
     this.label = scene.add.text(x, y - 12, '', {
       fontSize: '9px',
       color: '#88ccff',
       fontFamily: 'monospace',
-    }).setDepth(903);
+    }).setDepth(903).setScrollFactor(0);
 
     this.draw();
   }
