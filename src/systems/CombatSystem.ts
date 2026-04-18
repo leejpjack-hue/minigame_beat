@@ -167,6 +167,18 @@ export class CombatSystem {
 
     defender.takeDamage(dmg, kbx, kby);
 
+    // Play hit sound
+    const hitSounds = ['sfx_punch', 'sfx_kick'];
+    const randomHit = hitSounds[Math.floor(Math.random() * hitSounds.length)];
+    this.scene.sound.play(randomHit);
+
+    if ((move as HitboxDef).damage >= 20) {
+        this.scene.sound.play('sfx_slash', { volume: 0.8 });
+    }
+    if ((move as HitboxDef).mpCost > 0 || (move as any).isSpecial) {
+        this.scene.sound.play('sfx_special', { volume: 0.6 });
+    }
+
     this.hitCounter++;
     this.hitCounterTimer = 2000;
 

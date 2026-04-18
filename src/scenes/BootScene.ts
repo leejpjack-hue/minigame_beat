@@ -9,7 +9,29 @@ export class BootScene extends Phaser.Scene {
     super({ key: SceneKeys.Boot });
   }
 
-  preload(): void {}
+  preload(): void {
+    // BGM
+    this.load.audio('bgm_menu', 'assets/audio/bgm_menu.wav');
+    this.load.audio('bgm_stage1', 'assets/audio/bgm_stage1.wav');
+    this.load.audio('bgm_stage2', 'assets/audio/bgm_stage2.wav');
+    this.load.audio('bgm_stage3', 'assets/audio/bgm_stage3.wav');
+
+    // SFX
+    this.load.audio('sfx_punch', 'assets/audio/sfx_punch.wav');
+    this.load.audio('sfx_kick', 'assets/audio/sfx_kick.wav');
+    this.load.audio('sfx_slash', 'assets/audio/sfx_slash.wav');
+    this.load.audio('sfx_special', 'assets/audio/sfx_special.wav');
+
+    // Voices
+    this.load.audio('voice_shout1', 'assets/audio/voice_shout1.wav');
+    this.load.audio('voice_shout2', 'assets/audio/voice_shout2.wav');
+    this.load.audio('voice_ko', 'assets/audio/voice_ko.wav');
+
+    // UI
+    this.load.audio('ui_select', 'assets/audio/ui_select.wav');
+    this.load.audio('ui_confirm', 'assets/audio/ui_confirm.wav');
+    this.load.audio('ui_wave_start', 'assets/audio/ui_wave_start.wav');
+  }
 
   create(): void {
     // Generate 3 poses per fighter

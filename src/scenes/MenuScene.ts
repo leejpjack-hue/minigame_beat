@@ -58,6 +58,17 @@ export class MenuScene extends Phaser.Scene {
 
     // Input
     this.input.keyboard?.on('keydown-ENTER', () => {
+      this.sound.play('ui_confirm');
+      this.scene.start(SceneKeys.CharacterSelect);
+    });
+
+    this.input.on('pointerdown', () => {
+      this.sound.play('ui_confirm');
+      this.scene.start(SceneKeys.CharacterSelect);
+    });
+  }
+}
+n-ENTER', () => {
       this.scene.start(SceneKeys.CharacterSelect);
     });
 

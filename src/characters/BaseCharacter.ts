@@ -165,8 +165,14 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
     this.knockbackY = knockbackY;
 
     if (this.hp <= 0) {
+      this.scene.sound.play('voice_ko');
       this.stateMachine.forceTransition(CharacterState.Dead);
     } else {
+      // Random shout when hurt
+      if (Math.random() > 0.7) {
+        const shouts = ['voice_shout1', 'voice_shout2'];
+        this.scene.sound.play(shouts[Math.floor(Math.random() * shouts.length)], { volume: 0.6 });
+      }
       this.stateMachine.forceTransition(CharacterState.Hurt);
       this.bodySprite.setTint(0xffffff);
       this.scene.time.delayedCall(100, () => { if (this.bodySprite) this.bodySprite.clearTint(); });

@@ -171,7 +171,7 @@ Based on the original design document. Items marked **[DONE]** are implemented, 
 | Mobile Controls | 5/5 | 0 | 100% |
 | Polish & Effects | 9/9 | 0 | 100% |
 | Procedural Art | 5/5 | 0 | 100% |
-| **Audio** | **0/4** | **4** | **0%** |
+| **Audio** | **4/4** | **0** | **100%** |
 | **Visual Polish** | **0/6** | **6** | **0%** |
 | **Gameplay** | **0/6** | **6** | **0%** |
 | **Mobile/Capacitor** | **0/4** | **4** | **0%** |

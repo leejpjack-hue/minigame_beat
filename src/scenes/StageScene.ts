@@ -46,8 +46,17 @@ export class StageScene extends Phaser.Scene {
   }
 
   create(data?: { fighter?: FighterStats; stageIndex?: number }): void {
+    // Stop menu bgm
+    this.sound.stopByKey('bgm_menu');
+
     this.gameOver = false;
     this.currentStageIndex = data?.stageIndex ?? this.registry.get('currentStage') ?? 0;
+
+    // Play stage bgm
+    const bgmKey = `bgm_stage${Math.min(3, this.currentStageIndex + 1)}`;
+    if (!this.sound.get(bgmKey)?.isPlaying) {
+      this.sound.play(bgmKey, { loop: true, volume: 0.4 });
+    }
 
     const stageConfig = ALL_STAGES[this.currentStageIndex] ?? ALL_STAGES[0];
 

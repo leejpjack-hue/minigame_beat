@@ -186,6 +186,7 @@ export class StageManager {
     this.currentWave = waveIndex + 1;
     const wave = this.config.waves[waveIndex];
 
+    this.scene.sound.play('ui_wave_start');
     this.waveText.setText(`Wave ${this.currentWave}/${this.config.waves.length}`);
     this.waveText.setAlpha(1);
     this.scene.tweens.add({ targets: this.waveText, alpha: 0, duration: 2000, delay: 1000 });

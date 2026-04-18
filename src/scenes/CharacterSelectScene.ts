@@ -212,8 +212,13 @@ export class CharacterSelectScene extends Phaser.Scene {
   }
 
   private confirmSelection(): void {
+    this.sound.play('ui_confirm');
     const selected = ALL_FIGHTERS[this.selectedIndex];
     this.registry.set('selectedFighter', selected);
     this.scene.start(SceneKeys.Stage, { fighter: selected });
   }
+}
+age, { fighter: selected });
+  }
+}
 }
