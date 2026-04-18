@@ -65,10 +65,12 @@ export class CharacterSelectScene extends Phaser.Scene {
 
     // Keyboard input
     this.input.keyboard?.on('keydown-LEFT', () => {
+      this.sound.play('ui_select');
       this.selectedIndex = (this.selectedIndex - 1 + ALL_FIGHTERS.length) % ALL_FIGHTERS.length;
       this.updateSelection();
     });
     this.input.keyboard?.on('keydown-RIGHT', () => {
+      this.sound.play('ui_select');
       this.selectedIndex = (this.selectedIndex + 1) % ALL_FIGHTERS.length;
       this.updateSelection();
     });
@@ -81,6 +83,7 @@ export class CharacterSelectScene extends Phaser.Scene {
       for (let i = 0; i < this.cards.length; i++) {
         const card = this.cards[i];
         if (card.getBounds().contains(pointer.x, pointer.y)) {
+          if (this.selectedIndex !== i) this.sound.play('ui_select');
           this.selectedIndex = i;
           this.updateSelection();
           return;
@@ -217,8 +220,4 @@ export class CharacterSelectScene extends Phaser.Scene {
     this.registry.set('selectedFighter', selected);
     this.scene.start(SceneKeys.Stage, { fighter: selected });
   }
-}
-age, { fighter: selected });
-  }
-}
 }

@@ -8,6 +8,13 @@ export class MenuScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Play menu bgm
+    if (!this.sound.get('bgm_menu')) {
+      this.sound.add('bgm_menu', { loop: true, volume: 0.5 }).play();
+    } else if (!this.sound.get('bgm_menu')?.isPlaying) {
+      this.sound.play('bgm_menu', { loop: true, volume: 0.5 });
+    }
+
     const cx = GAME_WIDTH / 2;
     const cy = GAME_HEIGHT / 2;
 
@@ -64,15 +71,6 @@ export class MenuScene extends Phaser.Scene {
 
     this.input.on('pointerdown', () => {
       this.sound.play('ui_confirm');
-      this.scene.start(SceneKeys.CharacterSelect);
-    });
-  }
-}
-n-ENTER', () => {
-      this.scene.start(SceneKeys.CharacterSelect);
-    });
-
-    this.input.on('pointerdown', () => {
       this.scene.start(SceneKeys.CharacterSelect);
     });
   }
