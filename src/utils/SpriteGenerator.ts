@@ -370,4 +370,47 @@ export class SpriteGenerator {
       scene.textures.addCanvas(key, srcImg);
     }
   }
+
+  static generateCloud(scene: Phaser.Scene, key: string): void {
+    if (scene.textures.exists(key)) return;
+    const canvas = scene.textures.createCanvas(key, 120, 60)!;
+    const ctx = canvas.getContext();
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    const circles = [
+      { x: 30, y: 35, r: 20 }, { x: 60, y: 30, r: 25 }, { x: 90, y: 35, r: 20 },
+      { x: 50, y: 20, r: 18 }, { x: 75, y: 22, r: 16 }
+    ];
+    for (const c of circles) {
+      ctx.beginPath(); ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2); ctx.fill();
+    }
+    canvas.refresh();
+  }
+
+  static generateTree(scene: Phaser.Scene, key: string, color: string = '#2d4d22'): void {
+    if (scene.textures.exists(key)) return;
+    const canvas = scene.textures.createCanvas(key, 80, 120)!;
+    const ctx = canvas.getContext();
+    // trunk
+    ctx.fillStyle = '#4b3621';
+    ctx.fillRect(35, 80, 10, 40);
+    // foliage
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.moveTo(40, 0); ctx.lineTo(5, 40); ctx.lineTo(75, 40); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(40, 20); ctx.lineTo(10, 70); ctx.lineTo(70, 70); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(40, 40); ctx.lineTo(15, 90); ctx.lineTo(65, 90); ctx.closePath(); ctx.fill();
+    canvas.refresh();
+  }
+
+  static generateRock(scene: Phaser.Scene, key: string): void {
+    if (scene.textures.exists(key)) return;
+    const canvas = scene.textures.createCanvas(key, 40, 30)!;
+    const ctx = canvas.getContext();
+    ctx.fillStyle = '#777777';
+    ctx.beginPath();
+    ctx.moveTo(0, 30); ctx.lineTo(10, 5); ctx.lineTo(25, 0); ctx.lineTo(40, 30);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#555555'; // shading
+    ctx.beginPath(); ctx.moveTo(25, 0); ctx.lineTo(40, 30); ctx.lineTo(20, 30); ctx.closePath(); ctx.fill();
+    canvas.refresh();
+  }
 }

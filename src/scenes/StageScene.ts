@@ -101,6 +101,32 @@ export class StageScene extends Phaser.Scene {
     sky.fillRect(0, 0, stageWidth, STAGE_WALKABLE_Y_MIN);
     sky.setDepth(-10);
 
+    // -- ADDED DETAIL: Background Elements --
+    // Clouds
+    for (let i = 0; i < stageConfig.waves.length * 3; i++) {
+      const cx = Math.random() * stageWidth;
+      const cy = 20 + Math.random() * 60;
+      this.add.image(cx, cy, 'bg_cloud').setScrollFactor(0.2).setDepth(-9).setAlpha(0.6);
+    }
+
+    // Distant Trees/Rocks (behind walkable area)
+    for (let i = 0; i < stageConfig.waves.length * 8; i++) {
+      const tx = Math.random() * stageWidth;
+      const ty = STAGE_WALKABLE_Y_MIN - 10 - Math.random() * 20;
+      const isTree = Math.random() > 0.3;
+      const key = isTree ? (Math.random() > 0.5 ? 'bg_tree_1' : 'bg_tree_2') : 'bg_rock';
+      const scale = 0.5 + Math.random() * 0.5;
+      this.add.image(tx, ty, key).setOrigin(0.5, 1).setScale(scale).setDepth(-5).setScrollFactor(0.7);
+    }
+
+    // Floor Detail (Stones on the ground)
+    for (let i = 0; i < stageConfig.waves.length * 15; i++) {
+      const rx = Math.random() * stageWidth;
+      const ry = STAGE_WALKABLE_Y_MIN + Math.random() * (STAGE_WALKABLE_Y_MAX - STAGE_WALKABLE_Y_MIN);
+      const rock = this.add.image(rx, ry, 'bg_rock').setScale(0.3 + Math.random() * 0.4).setAlpha(0.7).setOrigin(0.5, 1);
+      rock.setDepth(ry); // Use ground Y for depth sorting
+    }
+
     // Stage title pinned to viewport
     this.add.text(GAME_WIDTH / 2, STAGE_WALKABLE_Y_MIN - 15, `${stageConfig.nameZH} - ${stageConfig.name}`, {
       fontSize: '14px', color: '#888888', fontFamily: 'monospace',

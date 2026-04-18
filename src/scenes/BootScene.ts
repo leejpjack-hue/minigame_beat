@@ -85,6 +85,12 @@ export class BootScene extends Phaser.Scene {
     // Shadow
     SpriteGenerator.generateShadow(this, 'shadow');
 
+    // Background elements
+    SpriteGenerator.generateCloud(this, 'bg_cloud');
+    SpriteGenerator.generateTree(this, 'bg_tree_1', '#2d4d22');
+    SpriteGenerator.generateTree(this, 'bg_tree_2', '#1a3a1a');
+    SpriteGenerator.generateRock(this, 'bg_rock');
+
     this.scene.start(SceneKeys.Menu);
   }
 }
