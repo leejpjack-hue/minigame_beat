@@ -8,12 +8,14 @@ os.makedirs('public/assets/audio', exist_ok=True)
 
 SAMPLE_RATE = 44100
 
-def generate_rock_segment(duration, base_freq, intensity=1.0):
+def generate_rock_segment(duration, base_freq, intensity=1.0, drum_style='standard'):
     num_samples = int(SAMPLE_RATE * duration)
     samples = []
     
-    # Simple drum pattern (kick on 1, snare on 3)
-    tempo = 140
+    # Tempo/Beats
+    tempo = 140 if drum_style != 'fast' else 170
+    if drum_style == 'slow_heavy': tempo = 100
+    
     samples_per_beat = int(SAMPLE_RATE * (60 / tempo))
     
     for i in range(num_samples):
@@ -21,32 +23,30 @@ def generate_rock_segment(duration, base_freq, intensity=1.0):
         beat_idx = i // samples_per_beat
         pos_in_beat = i % samples_per_beat
         
-        # --- GUITAR (Detuned Sawtooths for distortion feel) ---
-        # Power chord (Root, Fifth, Octave)
+        # --- GUITAR (Detuned Sawtooths) ---
         freqs = [base_freq, base_freq * 1.5, base_freq * 2.0]
         val_guitar = 0
         for f in freqs:
-            # "Super-saw" effect with slight detune
             val_guitar += (2.0 * ( (t * f * 1.005) % 1.0) - 1.0) * 0.3
             val_guitar += (2.0 * ( (t * f * 0.995) % 1.0) - 1.0) * 0.3
         
-        # Hard clipping for distortion
+        # Distortion
         val_guitar = max(-0.5, min(0.5, val_guitar * 2.0))
         
         # --- DRUMS ---
         val_drums = 0
-        # Kick (Low frequency drop)
-        if beat_idx % 2 == 0 and pos_in_beat < 2000:
-            kick_t = pos_in_beat / 2000
-            val_drums += math.sin(2.0 * math.pi * 60 * (1.0 - kick_t)) * (1.0 - kick_t) * 0.8
+        # Kick
+        if beat_idx % 2 == 0 and pos_in_beat < 2500:
+            kick_t = pos_in_beat / 2500
+            val_drums += math.sin(2.0 * math.pi * 50 * (1.0 - kick_t)) * (1.0 - kick_t) * 0.9
             
-        # Snare (Noise burst)
-        if beat_idx % 2 == 1 and pos_in_beat < 3000:
-            snare_t = pos_in_beat / 3000
-            val_drums += (random.uniform(-1.0, 1.0)) * (1.0 - snare_t) * 0.5
+        # Snare
+        if beat_idx % 2 == 1 and pos_in_beat < 3500:
+            snare_t = pos_in_beat / 3500
+            val_drums += (random.uniform(-1.0, 1.0)) * (1.0 - snare_t) * 0.6
             
-        # Hi-hat (Very short noise burst)
-        if pos_in_beat % (samples_per_beat // 2) < 500:
+        # Hi-hat
+        if pos_in_beat % (samples_per_beat // (4 if drum_style == 'fast' else 2)) < 600:
             val_drums += (random.uniform(-1.0, 1.0)) * 0.2
 
         val_total = (val_guitar * 0.6 + val_drums * 0.4) * intensity
@@ -63,35 +63,39 @@ def save_wav(filename, samples):
             packed_value = struct.pack('h', int(max(-1.0, min(1.0, s)) * 32767.0))
             wav_file.writeframes(packed_value)
 
-# Generate Stage BGMs with different progressions
-print("Generating high-energy rock BGMs...")
+print("Generating 4 distinct thematic stage BGMs...")
 
-# Stage 1: Energetic riff (E)
+# Stage 1: Xianyang Streets - Upbeat & Busy (E Mixolydian feel)
 s1 = []
-for f in [164.81, 164.81, 196.00, 220.00]: # E, E, G, A riff
+for f in [164.81, 196.00, 220.00, 164.81]: # E, G, A, E
     s1.extend(generate_rock_segment(0.5, f))
-save_wav('public/assets/audio/bgm_stage1.wav', s1 * 4)
+save_wav('public/assets/audio/bgm_stage1.wav', s1 * 8)
 
-# Stage 2: Driving riff (A)
+# Stage 2: Zhao Palace - Tense & Driving (A Minor feel)
 s2 = []
-for f in [220.00, 220.00, 261.63, 196.00]: # A, A, C, G riff
-    s2.extend(generate_rock_segment(0.4, f))
-save_wav('public/assets/audio/bgm_stage2.wav', s2 * 5)
+for f in [220.00, 261.63, 293.66, 220.00]: # A, C, D, A
+    s2.extend(generate_rock_segment(0.4, f, intensity=1.1))
+save_wav('public/assets/audio/bgm_stage2.wav', s2 * 10)
 
-# Stage 3: Fast intense riff (D)
+# Stage 3: Qin Border Wall - Fast & Aggressive (D Phrygian feel)
 s3 = []
-for f in [146.83, 174.61, 196.00, 146.83]: # D, F, G, D riff
-    s3.extend(generate_rock_segment(0.3, f, intensity=1.2))
-save_wav('public/assets/audio/bgm_stage3.wav', s3 * 8)
+for f in [146.83, 155.56, 174.61, 146.83]: # D, Eb, F, D
+    s3.extend(generate_rock_segment(0.3, f, intensity=1.3, drum_style='fast'))
+save_wav('public/assets/audio/bgm_stage3.wav', s3 * 16)
+
+# Stage 4: Qin Throne Room - Epic & Heavy (B Phrygian feel)
+s4 = []
+for f in [123.47, 130.81, 146.83, 123.47]: # B, C, D, B
+    s4.extend(generate_rock_segment(0.8, f, intensity=1.5, drum_style='slow_heavy'))
+save_wav('public/assets/audio/bgm_stage4.wav', s4 * 6)
 
 # Menu: Lighter rock
 sm = []
 for f in [196.00, 146.83, 164.81, 130.81]: # G, D, E, C
-    sm.extend(generate_rock_segment(1.0, f, intensity=0.7))
-save_wav('public/assets/audio/bgm_menu.wav', sm * 2)
+    sm.extend(generate_rock_segment(1.0, f, intensity=0.6))
+save_wav('public/assets/audio/bgm_menu.wav', sm * 4)
 
-# Keep other sounds as they are (or slightly refine if needed, but the request was BGM)
-# I'll just regenerate them to ensure consistency
+# Regenerate UI/SFX to be sure
 def generate_simple_tone(filename, freq, duration, volume=0.5, wave_type='sine'):
     num_samples = int(SAMPLE_RATE * duration)
     samples = []
@@ -115,4 +119,4 @@ generate_simple_tone('public/assets/audio/ui_select.wav', 600, 0.1, wave_type='s
 generate_simple_tone('public/assets/audio/ui_confirm.wav', 800, 0.15, wave_type='sine')
 generate_simple_tone('public/assets/audio/ui_wave_start.wav', 440, 0.5, wave_type='sine')
 
-print("High-energy audio placeholders generated.")
+print("Thematic stage BGMs generated.")

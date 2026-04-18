@@ -15,6 +15,7 @@ export class BootScene extends Phaser.Scene {
     this.load.audio('bgm_stage1', 'assets/audio/bgm_stage1.wav');
     this.load.audio('bgm_stage2', 'assets/audio/bgm_stage2.wav');
     this.load.audio('bgm_stage3', 'assets/audio/bgm_stage3.wav');
+    this.load.audio('bgm_stage4', 'assets/audio/bgm_stage4.wav');
 
     // SFX
     this.load.audio('sfx_punch', 'assets/audio/sfx_punch.wav');

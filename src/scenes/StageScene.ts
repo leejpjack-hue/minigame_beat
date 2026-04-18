@@ -77,7 +77,7 @@ export class StageScene extends Phaser.Scene {
     this.player2 = null;
 
     // Play stage bgm
-    const bgmKey = `bgm_stage${Math.min(3, this.currentStageIndex + 1)}`;
+    const bgmKey = `bgm_stage${Math.min(4, this.currentStageIndex + 1)}`;
     if (!this.sound.get(bgmKey)?.isPlaying) {
       this.sound.play(bgmKey, { loop: true, volume: 0.4 });
     }
