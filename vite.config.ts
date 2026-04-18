@@ -7,6 +7,16 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    host: true,
+    port: 8888,
+    allowedHosts: ['minigame.teqcon.uk', 'localhost', '167.179.88.55'],
+  },
+  preview: {
+    host: true,
+    port: 8888,
+    allowedHosts: ['minigame.teqcon.uk', 'localhost', '167.179.88.55'],
+  },
   build: {
     rollupOptions: {
       output: {
