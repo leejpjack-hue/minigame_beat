@@ -91,6 +91,15 @@ export class BootScene extends Phaser.Scene {
     SpriteGenerator.generateTree(this, 'bg_tree_2', '#1a3a1a');
     SpriteGenerator.generateRock(this, 'bg_rock');
 
+    // Thematic elements
+    SpriteGenerator.generateStall(this, 'bg_stall_blue', '#2196f3');
+    SpriteGenerator.generateStall(this, 'bg_stall_red', '#f44336');
+    SpriteGenerator.generateLantern(this, 'bg_lantern');
+    SpriteGenerator.generateBanner(this, 'bg_banner_qin', '秦', '#000000');
+    SpriteGenerator.generateBanner(this, 'bg_banner_zhao', '趙', '#d32f2f');
+    SpriteGenerator.generateHouse(this, 'bg_house_1', '#795548');
+    SpriteGenerator.generateHouse(this, 'bg_house_2', '#4e342e');
+
     this.scene.start(SceneKeys.Menu);
   }
 }

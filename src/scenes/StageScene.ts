@@ -112,21 +112,58 @@ export class StageScene extends Phaser.Scene {
     sky.setDepth(-10);
 
     // -- ADDED DETAIL: Background Elements --
-    // Clouds
+    const stageName = stageConfig.name;
+
+    // Clouds (all stages except maybe Throne Room, but let's keep for now)
     for (let i = 0; i < stageConfig.waves.length * 3; i++) {
       const cx = Math.random() * stageWidth;
       const cy = 20 + Math.random() * 60;
       this.add.image(cx, cy, 'bg_cloud').setScrollFactor(0.2).setDepth(-9).setAlpha(0.6);
     }
 
-    // Distant Trees/Rocks (behind walkable area)
-    for (let i = 0; i < stageConfig.waves.length * 8; i++) {
+    // Distant Parallax (Houses for streets/palace, Trees/Rocks for border)
+    for (let i = 0; i < stageConfig.waves.length * 10; i++) {
       const tx = Math.random() * stageWidth;
       const ty = STAGE_WALKABLE_Y_MIN - 10 - Math.random() * 20;
-      const isTree = Math.random() > 0.3;
-      const key = isTree ? (Math.random() > 0.5 ? 'bg_tree_1' : 'bg_tree_2') : 'bg_rock';
-      const scale = 0.5 + Math.random() * 0.5;
-      this.add.image(tx, ty, key).setOrigin(0.5, 1).setScale(scale).setDepth(-5).setScrollFactor(0.7);
+      let key = '';
+
+      if (stageName === 'Xianyang Streets' || stageName === 'Zhao Palace') {
+        key = Math.random() > 0.5 ? 'bg_house_1' : 'bg_house_2';
+      } else {
+        key = Math.random() > 0.4 ? (Math.random() > 0.5 ? 'bg_tree_1' : 'bg_tree_2') : 'bg_rock';
+      }
+
+      const scale = 0.6 + Math.random() * 0.4;
+      this.add.image(tx, ty, key).setOrigin(0.5, 1).setScale(scale).setDepth(-5).setScrollFactor(0.7).setAlpha(0.8);
+    }
+
+    // Interactive/Mid-ground Details (Stalls, Lanterns, Banners)
+    for (let i = 0; i < stageConfig.waves.length * 5; i++) {
+      const tx = Math.random() * stageWidth;
+      const ty = STAGE_WALKABLE_Y_MIN - 5;
+      const rand = Math.random();
+
+      if (stageName === 'Xianyang Streets') {
+        if (rand > 0.7) {
+          this.add.image(tx, ty, Math.random() > 0.5 ? 'bg_stall_blue' : 'bg_stall_red').setOrigin(0.5, 1).setDepth(-4).setScrollFactor(0.9);
+        } else if (rand > 0.4) {
+          this.add.image(tx, ty - 80, 'bg_lantern').setOrigin(0.5, 0).setDepth(-4).setScrollFactor(0.9);
+        } else {
+          this.add.image(tx, ty, 'bg_banner_qin').setOrigin(0.5, 1).setDepth(-4).setScrollFactor(0.9);
+        }
+      } else if (stageName === 'Zhao Palace') {
+        if (rand > 0.6) {
+          this.add.image(tx, ty, 'bg_banner_zhao').setOrigin(0.5, 1).setDepth(-4).setScrollFactor(0.9);
+        } else {
+          this.add.image(tx, ty - 80, 'bg_lantern').setOrigin(0.5, 0).setDepth(-4).setScrollFactor(0.9);
+        }
+      } else if (stageName === 'Qin Border Wall' || stageName === 'Qin Throne Room') {
+        if (rand > 0.5) {
+          this.add.image(tx, ty, 'bg_banner_qin').setOrigin(0.5, 1).setDepth(-4).setScrollFactor(0.9);
+        } else if (stageName === 'Qin Throne Room' && rand > 0.2) {
+          this.add.image(tx, ty - 100, 'bg_lantern').setOrigin(0.5, 0).setScale(1.5).setDepth(-4).setScrollFactor(0.9);
+        }
+      }
     }
 
     // Floor Detail (Stones on the ground)
@@ -134,7 +171,7 @@ export class StageScene extends Phaser.Scene {
       const rx = Math.random() * stageWidth;
       const ry = STAGE_WALKABLE_Y_MIN + Math.random() * (STAGE_WALKABLE_Y_MAX - STAGE_WALKABLE_Y_MIN);
       const rock = this.add.image(rx, ry, 'bg_rock').setScale(0.3 + Math.random() * 0.4).setAlpha(0.7).setOrigin(0.5, 1);
-      rock.setDepth(ry); // Use ground Y for depth sorting
+      rock.setDepth(ry);
     }
 
     // Stage title pinned to viewport

@@ -413,4 +413,76 @@ export class SpriteGenerator {
     ctx.beginPath(); ctx.moveTo(25, 0); ctx.lineTo(40, 30); ctx.lineTo(20, 30); ctx.closePath(); ctx.fill();
     canvas.refresh();
   }
+
+  static generateStall(scene: Phaser.Scene, key: string, color: string): void {
+    if (scene.textures.exists(key)) return;
+    const canvas = scene.textures.createCanvas(key, 100, 80)!;
+    const ctx = canvas.getContext();
+    // Table/Base
+    ctx.fillStyle = '#5d4037';
+    ctx.fillRect(10, 50, 80, 30);
+    // Poles
+    ctx.fillStyle = '#795548';
+    ctx.fillRect(15, 20, 5, 30);
+    ctx.fillRect(80, 20, 5, 30);
+    // Roof (Striped)
+    ctx.fillStyle = color;
+    ctx.fillRect(10, 10, 80, 15);
+    ctx.fillStyle = '#ffffff';
+    for (let i = 0; i < 4; i++) {
+      ctx.fillRect(15 + i * 20, 10, 10, 15);
+    }
+    canvas.refresh();
+  }
+
+  static generateLantern(scene: Phaser.Scene, key: string): void {
+    if (scene.textures.exists(key)) return;
+    const canvas = scene.textures.createCanvas(key, 20, 40)!;
+    const ctx = canvas.getContext();
+    // String
+    ctx.strokeStyle = '#333333';
+    ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(10, 10); ctx.stroke();
+    // Body
+    ctx.fillStyle = '#d32f2f';
+    ctx.beginPath(); ctx.arc(10, 25, 10, 0, Math.PI * 2); ctx.fill();
+    // Glow effect
+    ctx.fillStyle = 'rgba(255, 235, 59, 0.4)';
+    ctx.beginPath(); ctx.arc(10, 25, 15, 0, Math.PI * 2); ctx.fill();
+    canvas.refresh();
+  }
+
+  static generateBanner(scene: Phaser.Scene, key: string, char: string, color: string): void {
+    if (scene.textures.exists(key)) return;
+    const canvas = scene.textures.createCanvas(key, 30, 80)!;
+    const ctx = canvas.getContext();
+    // Pole
+    ctx.fillStyle = '#4e342e';
+    ctx.fillRect(13, 0, 4, 80);
+    // Cloth
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 10, 30, 50);
+    // Text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 16px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(char, 15, 40);
+    canvas.refresh();
+  }
+
+  static generateHouse(scene: Phaser.Scene, key: string, color: string): void {
+    if (scene.textures.exists(key)) return;
+    const canvas = scene.textures.createCanvas(key, 120, 100)!;
+    const ctx = canvas.getContext();
+    // Main body
+    ctx.fillStyle = color;
+    ctx.fillRect(10, 40, 100, 60);
+    // Roof
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath(); ctx.moveTo(0, 45); ctx.lineTo(60, 10); ctx.lineTo(120, 45); ctx.closePath(); ctx.fill();
+    // Windows
+    ctx.fillStyle = '#fff59d';
+    ctx.fillRect(25, 60, 20, 20);
+    ctx.fillRect(75, 60, 20, 20);
+    canvas.refresh();
+  }
 }
