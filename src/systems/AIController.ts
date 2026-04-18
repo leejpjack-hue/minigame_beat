@@ -46,6 +46,7 @@ export class AIController {
   private actionDuration = 0;
   private patrolTarget = { x: 0, y: 0 };
   private chargeDir: 1 | -1 = 1;
+  private allPlayers: BaseCharacter[] = [];
 
   constructor(owner: EnemyCharacter, type: string = 'normal') {
     this.owner = owner;
@@ -55,6 +56,23 @@ export class AIController {
 
   setTarget(target: BaseCharacter): void {
     this.target = target;
+  }
+
+  setAllPlayers(players: BaseCharacter[]): void {
+    this.allPlayers = players;
+  }
+
+  private retarget(): void {
+    const alive = this.allPlayers.filter((p) => p.isAlive);
+    if (alive.length === 0) return;
+    if (alive.length === 1) { this.target = alive[0]; return; }
+    let best = alive[0];
+    let bestDist = Infinity;
+    for (const p of alive) {
+      const d = Math.sqrt((p.x - this.owner.x) ** 2 + (p.groundY - this.owner.groundY) ** 2);
+      if (d < bestDist) { bestDist = d; best = p; }
+    }
+    this.target = best;
   }
 
   update(time: number, delta: number): void {
@@ -68,6 +86,7 @@ export class AIController {
       return;
     }
     this.decisionTimer = this.personality.reactionTime + Math.random() * 200;
+    if (this.allPlayers.length > 1) this.retarget();
     this.makeDecision();
     this.executeCurrentAction(delta);
   }

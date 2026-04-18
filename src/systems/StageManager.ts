@@ -130,7 +130,7 @@ export class StageManager {
   private currentWave = 0;
   private enemies: EnemyCharacter[] = [];
   private aiControllers: AIController[] = [];
-  private player!: BaseCharacter;
+  private players: BaseCharacter[] = [];
   private zDepthSorter: ZDepthSorter;
   private combatSystem: CombatSystem;
   private projectiles: ProjectileSystem;
@@ -140,14 +140,14 @@ export class StageManager {
   constructor(
     scene: Phaser.Scene,
     config: StageConfig,
-    player: BaseCharacter,
+    players: BaseCharacter[],
     zDepthSorter: ZDepthSorter,
     combatSystem: CombatSystem,
     projectiles: ProjectileSystem,
   ) {
     this.scene = scene;
     this.config = config;
-    this.player = player;
+    this.players = players;
     this.zDepthSorter = zDepthSorter;
     this.combatSystem = combatSystem;
     this.projectiles = projectiles;
@@ -225,7 +225,8 @@ export class StageManager {
       };
 
       const ai = new AIController(enemy, typeDef.aiPersonality);
-      ai.setTarget(this.player);
+      ai.setTarget(this.nearestAlivePlayer(enemy.x, enemy.groundY));
+      ai.setAllPlayers(this.players);
 
       this.enemies.push(enemy);
       this.aiControllers.push(ai);
@@ -249,11 +250,25 @@ export class StageManager {
     const typeDef = ENEMY_TYPES['soldier'];
     const enemy = new EnemyCharacter(this.scene, x, y, typeDef.stats, typeDef);
     const ai = new AIController(enemy, typeDef.aiPersonality);
-    ai.setTarget(this.player);
+    ai.setTarget(this.nearestAlivePlayer(x, y));
+    ai.setAllPlayers(this.players);
     this.enemies.push(enemy);
     this.aiControllers.push(ai);
     this.zDepthSorter.addCharacter(enemy);
     this.combatSystem.addCharacter(enemy);
+  }
+
+  nearestAlivePlayer(fromX: number, fromY: number): BaseCharacter {
+    const alive = this.players.filter((p) => p.isAlive);
+    if (alive.length === 0) return this.players[0]; // fallback
+    if (alive.length === 1) return alive[0];
+    let best = alive[0];
+    let bestDist = Infinity;
+    for (const p of alive) {
+      const d = Math.sqrt((p.x - fromX) ** 2 + (p.groundY - fromY) ** 2);
+      if (d < bestDist) { bestDist = d; best = p; }
+    }
+    return best;
   }
 
   destroy(): void { this.waveText?.destroy(); }

@@ -89,6 +89,7 @@ export class CombatSystem {
       for (const defender of this.allCharacters) {
         if (defender === attacker || !defender.isAlive) continue;
         if (defender.stateMachine.currentState === CharacterState.Dead) continue;
+        if (this.isSameFaction(attacker, defender)) continue;
 
         const cooldownKey = `${attacker.x.toFixed(0)}_${defender.x.toFixed(0)}_${attacker.currentAttackName}_${this.multiHitTick(attacker, move)}`;
         if (this.hitCooldowns.has(cooldownKey)) continue;
@@ -142,6 +143,7 @@ export class CombatSystem {
     const dir = attacker.facing === Direction.Right ? 1 : -1;
     for (const defender of this.allCharacters) {
       if (defender === attacker || !defender.isAlive) continue;
+      if (this.isSameFaction(attacker, defender)) continue;
       // Screen flash
       defender.takeDamage(move.damage, move.knockbackX * dir * 0.5, move.knockbackY);
     }
@@ -222,6 +224,10 @@ export class CombatSystem {
       char.stats.width,
       char.stats.height
     );
+  }
+
+  private isSameFaction(a: BaseCharacter, b: BaseCharacter): boolean {
+    return (a as any).isPlayer === (b as any).isPlayer;
   }
 
   private drawDebugRect(rect: Phaser.Geom.Rectangle, color: number, alpha: number): void {
