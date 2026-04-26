@@ -1,13 +1,31 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+  <script type="module" src="/@vite/client"></script>
+
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
   <title>尋秦記齊打交</title>
   <style>
-    * { margin: 0; padding: 0; }
-    body { background: #000; overflow: hidden; }
-    canvas { display: block; margin: 0 auto; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      background: #000;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      overscroll-behavior: none;
+    }
+    canvas {
+      display: block;
+      margin: 0 auto;
+      touch-action: none;
+    }
   </style>
 </head>
 <body>

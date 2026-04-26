@@ -186,8 +186,8 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
   private fighterAccentColor(): number {
     const key = String(this.stats?.fighterKey ?? '');
     switch (key) {
-      case 'lian_jin':       return 0x66ddff; // cyan sword light (墨子劍法)
-      case 'xiang_shao_long':return 0xffcc33; // gold (跆拳 gap-closer)
+      case 'xiang_shao_long':return 0x66ddff; // cyan sword light (墨子劍法 — taught by 元宗)
+      case 'lian_jin':       return 0xff5566; // crimson (連晉 ruthless edge)
       case 'wu_ting_fang':   return 0xff88cc; // pink (agile whirl)
       case 'shan_rou':       return 0xaa66ff; // purple (shadow daggers)
       case 'ying_zheng':     return 0xffdd44; // imperial gold
@@ -375,7 +375,7 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
   /** Emit sword-trail streaks during active attack frames (called each tick for sword fighters). */
   protected updateSwordTrail(delta: number): void {
     const key = String(this.stats?.fighterKey ?? '');
-    const sword = key === 'lian_jin'; // 墨子劍法 glows while sword moves
+    const sword = key === 'xiang_shao_long'; // 墨子劍法 glows while sword moves (項少龍)
     if (!sword) return;
     if (this.stateMachine.currentState !== CharacterState.Attack) {
       this.swordTrailCooldown = 0;

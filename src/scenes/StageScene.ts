@@ -233,6 +233,8 @@ export class StageScene extends Phaser.Scene {
     this.events.on('button-jump', () => this.player.handleComboInput(ComboInput.Jump));
     this.events.on('button-special', () => this.player.executeCombo('special_forward'));
     this.events.on('button-block', () => this.player.handleComboInput(ComboInput.Defend));
+    this.events.on('button-heavy', () => this.player.performHeavy());
+    this.events.on('button-stone', () => this.stonePickup.tryAction(this.player));
 
     // Keyboard
     if (this.input.keyboard) {

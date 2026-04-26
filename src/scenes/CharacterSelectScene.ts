@@ -40,9 +40,24 @@ export class CharacterSelectScene extends Phaser.Scene {
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
 
-    this.add.text(GAME_WIDTH / 2, 72, 'Press [1] or [2] to switch mode', {
+    this.add.text(GAME_WIDTH / 2, 72, 'Press [1] or [2] to switch mode  (or tap below)', {
       fontSize: '10px', fontFamily: 'monospace', color: '#666666',
     }).setOrigin(0.5);
+
+    // Touch-friendly mode-toggle buttons
+    const mkModeBtn = (label: string, x: number, mode: '1p' | '2p') => {
+      const bg = this.add.rectangle(x, 95, 100, 26, 0x223355, 0.85)
+        .setStrokeStyle(2, 0x66ddff, 0.9)
+        .setInteractive({ useHandCursor: true })
+        .setOrigin(0.5);
+      const txt = this.add.text(x, 95, label, {
+        fontSize: '14px', fontFamily: 'monospace', color: '#ffffff',
+      }).setOrigin(0.5);
+      bg.on('pointerdown', () => { this.sound.play('ui_select'); this.setMode(mode); });
+      return { bg, txt };
+    };
+    mkModeBtn('1P MODE',  GAME_WIDTH / 2 - 60, '1p');
+    mkModeBtn('2P MODE',  GAME_WIDTH / 2 + 60, '2p');
 
     // Create fighter cards
     const cardWidth = 120;
@@ -119,6 +134,16 @@ export class CharacterSelectScene extends Phaser.Scene {
       if (this.mode === '1p') this.confirmP1();
       else this.confirmP2();
     });
+
+    // Touch-friendly Back button
+    const backBtn = this.add.rectangle(60, GAME_HEIGHT - 22, 90, 26, 0x442222, 0.85)
+      .setStrokeStyle(2, 0xff8888, 0.9)
+      .setInteractive({ useHandCursor: true })
+      .setOrigin(0.5);
+    this.add.text(60, GAME_HEIGHT - 22, '< BACK', {
+      fontSize: '12px', fontFamily: 'monospace', color: '#ffffff',
+    }).setOrigin(0.5);
+    backBtn.on('pointerdown', () => { this.sound.play('ui_select'); this.scene.start(SceneKeys.Menu); });
 
     // Touch: tap card to select, tap confirm button
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {

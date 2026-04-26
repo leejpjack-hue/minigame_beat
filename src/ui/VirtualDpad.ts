@@ -1,28 +1,43 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config/constants';
 
+interface TouchButton {
+  circle: Phaser.GameObjects.Arc;
+  label: Phaser.GameObjects.Text;
+  x: number;
+  y: number;
+  radius: number;
+  event: string;
+  pressedBy: number; // pointer id, -1 when free
+  baseColor: number;
+}
+
+/**
+ * On-screen virtual D-pad + action buttons for touch devices.
+ * - Left circular pad: virtual joystick (drag from center).
+ * - Right cluster: 6 buttons (Attack / Heavy / Special / Jump / Block / Stone).
+ * - Multi-touch safe: each button tracks its own pointer id; the dpad ignores
+ *   pointers that started on a button.
+ */
 export class VirtualDpad {
   private scene: Phaser.Scene;
   private container!: Phaser.GameObjects.Container;
 
-  // D-pad
   private dpadBase!: Phaser.GameObjects.Arc;
+  private dpadX = 90;
+  private dpadY = GAME_HEIGHT - 90;
+  private dpadRadius = 60;
   private dpadDirection = { x: 0, y: 0 };
   private dpadPointerId = -1;
 
-  // Buttons
-  private btnAttack!: Phaser.GameObjects.Arc;
-  private btnJump!: Phaser.GameObjects.Arc;
-  private btnSpecial!: Phaser.GameObjects.Arc;
-  private btnBlock!: Phaser.GameObjects.Arc;
+  private buttons: TouchButton[] = [];
+  private buttonOwner: Map<number, TouchButton> = new Map(); // pointerId -> button
 
-  // State
   private isVisible = false;
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
     this.create();
-    // Show on touch devices
     this.detectTouchDevice();
   }
 
@@ -31,136 +46,131 @@ export class VirtualDpad {
     this.container.setDepth(900);
     this.container.setScrollFactor(0);
 
-    // --- D-Pad (left side) ---
-    const dpadX = 90;
-    const dpadY = GAME_HEIGHT - 90;
-
-    // Base circle
-    this.dpadBase = this.scene.add.circle(dpadX, dpadY, 55, 0x000000, 0.3);
-    this.dpadBase.setStrokeStyle(2, 0xffffff, 0.3);
+    // --- D-Pad (left) ---
+    this.dpadBase = this.scene.add.circle(this.dpadX, this.dpadY, this.dpadRadius, 0x000000, 0.35);
+    this.dpadBase.setStrokeStyle(2, 0xffffff, 0.4);
     this.container.add(this.dpadBase);
 
-    // Direction arrows
-    const arrowSize = 18;
-    const arrowOffset = 35;
+    const arrowSize = 20;
+    const arrowOffset = 38;
+    this.makeArrow(this.dpadX, this.dpadY - arrowOffset, arrowSize, '▲');
+    this.makeArrow(this.dpadX, this.dpadY + arrowOffset, arrowSize, '▼');
+    this.makeArrow(this.dpadX - arrowOffset, this.dpadY, arrowSize, '◄');
+    this.makeArrow(this.dpadX + arrowOffset, this.dpadY, arrowSize, '►');
 
-    // Up
-    const upArrow = this.createArrow(dpadX, dpadY - arrowOffset, arrowSize, 'up');
-    // Down
-    const downArrow = this.createArrow(dpadX, dpadY + arrowOffset, arrowSize, 'down');
-    // Left
-    const leftArrow = this.createArrow(dpadX - arrowOffset, dpadY, arrowSize, 'left');
-    // Right
-    const rightArrow = this.createArrow(dpadX + arrowOffset, dpadY, arrowSize, 'right');
+    // --- Action Buttons (right cluster) ---
+    // Layout (left col closer to dpad, right col edge of screen):
+    //   重(K)  攻(J)
+    //   防(L)  特
+    //   石(H)  跳(SPACE)
+    const colR = GAME_WIDTH - 50;
+    const colL = GAME_WIDTH - 110;
+    const rowT = GAME_HEIGHT - 160;
+    const rowM = GAME_HEIGHT - 100;
+    const rowB = GAME_HEIGHT - 40;
+    const r = 26;
 
-    // --- Action Buttons (right side) ---
-    const btnX = GAME_WIDTH - 90;
-    const btnY = GAME_HEIGHT - 90;
-    const btnRadius = 28;
-    const btnSpacing = 60;
+    this.addButton(colL, rowT, r, 0xff8833, '重',  'button-heavy');
+    this.addButton(colR, rowT, r, 0xff4444, '攻',  'button-attack');
+    this.addButton(colL, rowM, r, 0x44ff44, '防',  'button-block');
+    this.addButton(colR, rowM, r, 0xffdd00, '特',  'button-special');
+    this.addButton(colL, rowB, r, 0xaaaaaa, '石',  'button-stone');
+    this.addButton(colR, rowB, r, 0x44aaff, '跳',  'button-jump');
 
-    this.btnAttack = this.createButton(btnX, btnY, btnRadius, 0xff4444, '攻');
-    this.btnJump = this.createButton(btnX - btnSpacing, btnY - 20, btnRadius, 0x44aaff, '跳');
-    this.btnSpecial = this.createButton(btnX + btnSpacing, btnY - 20, btnRadius, 0xffdd00, '特');
-    this.btnBlock = this.createButton(btnX, btnY - btnSpacing - 10, btnRadius, 0x44ff44, '防');
-
-    // Touch handlers
-    this.setupTouchHandlers(dpadX, dpadY);
+    this.setupPointerHandlers();
   }
 
-  private createArrow(x: number, y: number, size: number, direction: string): Phaser.GameObjects.Text {
-    const arrows: Record<string, string> = { up: '▲', down: '▼', left: '◄', right: '►' };
-    const text = this.scene.add.text(x, y, arrows[direction], {
-      fontSize: `${size}px`,
-      color: '#ffffff',
-      fontFamily: 'monospace',
-    }).setOrigin(0.5).setAlpha(0.5);
+  private makeArrow(x: number, y: number, size: number, ch: string): void {
+    const text = this.scene.add.text(x, y, ch, {
+      fontSize: `${size}px`, color: '#ffffff', fontFamily: 'monospace',
+    }).setOrigin(0.5).setAlpha(0.55);
     this.container.add(text);
-    return text;
   }
 
-  private createButton(x: number, y: number, radius: number, color: number, label: string): Phaser.GameObjects.Arc {
-    const circle = this.scene.add.circle(x, y, radius, color, 0.4);
-    circle.setStrokeStyle(2, color, 0.7);
+  private addButton(x: number, y: number, radius: number, color: number, label: string, event: string): void {
+    const circle = this.scene.add.circle(x, y, radius, color, 0.45);
+    circle.setStrokeStyle(2, color, 0.85);
     this.container.add(circle);
-
     const text = this.scene.add.text(x, y, label, {
-      fontSize: '14px',
-      color: '#ffffff',
-      fontFamily: 'monospace',
+      fontSize: '15px', color: '#ffffff', fontFamily: 'monospace',
+      stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     this.container.add(text);
-
-    return circle;
+    this.buttons.push({ circle, label: text, x, y, radius: radius + 4, event, pressedBy: -1, baseColor: color });
   }
 
-  private setupTouchHandlers(dpadX: number, dpadY: number): void {
-    // D-pad touch
-    this.scene.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+  private setupPointerHandlers(): void {
+    const onDown = (pointer: Phaser.Input.Pointer) => {
       if (!this.isVisible) return;
-
-      const dist = Phaser.Math.Distance.Between(pointer.x, pointer.y, dpadX, dpadY);
-      if (dist < 60 && this.dpadPointerId === -1) {
+      // Test buttons first (right cluster)
+      for (const b of this.buttons) {
+        if (b.pressedBy !== -1) continue;
+        if (Phaser.Math.Distance.Between(pointer.x, pointer.y, b.x, b.y) <= b.radius) {
+          b.pressedBy = pointer.id;
+          this.buttonOwner.set(pointer.id, b);
+          b.circle.setFillStyle(b.baseColor, 0.85);
+          this.scene.events.emit(b.event);
+          return;
+        }
+      }
+      // Then dpad (left circle)
+      if (this.dpadPointerId === -1 &&
+          Phaser.Math.Distance.Between(pointer.x, pointer.y, this.dpadX, this.dpadY) <= this.dpadRadius + 10) {
         this.dpadPointerId = pointer.id;
-        this.updateDpad(pointer.x, pointer.y, dpadX, dpadY);
+        this.updateDpad(pointer.x, pointer.y);
       }
-    });
+    };
 
-    this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+    const onMove = (pointer: Phaser.Input.Pointer) => {
+      if (!this.isVisible) return;
       if (pointer.id === this.dpadPointerId) {
-        this.updateDpad(pointer.x, pointer.y, dpadX, dpadY);
+        this.updateDpad(pointer.x, pointer.y);
       }
-    });
+    };
 
-    this.scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+    const onUp = (pointer: Phaser.Input.Pointer) => {
+      const owned = this.buttonOwner.get(pointer.id);
+      if (owned) {
+        owned.pressedBy = -1;
+        owned.circle.setFillStyle(owned.baseColor, 0.45);
+        this.buttonOwner.delete(pointer.id);
+      }
       if (pointer.id === this.dpadPointerId) {
         this.dpadPointerId = -1;
         this.dpadDirection = { x: 0, y: 0 };
         this.scene.events.emit('dpad-release');
       }
-    });
-
-    // Button touches
-    this.setupButtonTouch(this.btnAttack, 'button-attack');
-    this.setupButtonTouch(this.btnJump, 'button-jump');
-    this.setupButtonTouch(this.btnSpecial, 'button-special');
-    this.setupButtonTouch(this.btnBlock, 'button-block');
-  }
-
-  private setupButtonTouch(button: Phaser.GameObjects.Arc, event: string): void {
-    this.scene.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      if (!this.isVisible) return;
-      const dist = Phaser.Math.Distance.Between(pointer.x, pointer.y, button.x, button.y);
-      if (dist < 30) {
-        this.scene.events.emit(event);
-      }
-    });
-  }
-
-  private updateDpad(px: number, py: number, cx: number, cy: number): void {
-    const dx = px - cx;
-    const dy = py - cy;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-
-    if (dist < 10) {
-      this.dpadDirection = { x: 0, y: 0 };
-      return;
-    }
-
-    // Normalize to -1, 0, 1 for each axis
-    this.dpadDirection = {
-      x: Math.abs(dx) > 15 ? (dx > 0 ? 1 : -1) : 0,
-      y: Math.abs(dy) > 15 ? (dy > 0 ? 1 : -1) : 0,
     };
 
-    this.scene.events.emit('dpad-move', this.dpadDirection.x, this.dpadDirection.y);
+    this.scene.input.on('pointerdown', onDown);
+    this.scene.input.on('pointermove', onMove);
+    this.scene.input.on('pointerup', onUp);
+    this.scene.input.on('pointerupoutside', onUp);
+    this.scene.input.on('pointercancel', onUp);
+  }
+
+  private updateDpad(px: number, py: number): void {
+    const dx = px - this.dpadX;
+    const dy = py - this.dpadY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 12) {
+      if (this.dpadDirection.x !== 0 || this.dpadDirection.y !== 0) {
+        this.dpadDirection = { x: 0, y: 0 };
+        this.scene.events.emit('dpad-move', 0, 0);
+      }
+      return;
+    }
+    const nx = Math.abs(dx) > 18 ? (dx > 0 ? 1 : -1) : 0;
+    const ny = Math.abs(dy) > 18 ? (dy > 0 ? 1 : -1) : 0;
+    if (nx !== this.dpadDirection.x || ny !== this.dpadDirection.y) {
+      this.dpadDirection = { x: nx, y: ny };
+    }
+    this.scene.events.emit('dpad-move', nx, ny);
   }
 
   private detectTouchDevice(): void {
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    if (isTouch) {
-      this.show();
-    }
+    if (isTouch) this.show();
   }
 
   show(): void {
