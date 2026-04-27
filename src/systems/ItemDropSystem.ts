@@ -8,6 +8,7 @@ interface DroppedItem {
   y: number; // groundY
   type: ItemType;
   gfx: Phaser.GameObjects.Container;
+  glowTween?: Phaser.Tweens.Tween;
   alive: boolean;
 }
 
@@ -35,11 +36,12 @@ export class ItemDropSystem {
     // Cork
     const cork = this.scene.add.rectangle(0, -14, 6, 4, 0x8b4513);
     
-    // Glow effect
+    // Glow effect — tween scale (NOT radius) so a destroyed Arc is a safe no-op
     const glow = this.scene.add.circle(0, 0, 16, bodyColor, 0.4);
-    this.scene.tweens.add({
+    const glowTween = this.scene.tweens.add({
       targets: glow,
-      radius: 20,
+      scaleX: 1.25,
+      scaleY: 1.25,
       alpha: 0.1,
       duration: 800,
       yoyo: true,
@@ -48,7 +50,7 @@ export class ItemDropSystem {
 
     c.add([glow, body, neck, cork]);
     c.setDepth(groundY);
-    
+
     // Small spawn pop animation
     c.setScale(0);
     this.scene.tweens.add({
@@ -59,7 +61,7 @@ export class ItemDropSystem {
       ease: 'Back.easeOut'
     });
 
-    this.items.push({ x, y: groundY, type, gfx: c, alive: true });
+    this.items.push({ x, y: groundY, type, gfx: c, glowTween, alive: true });
   }
 
   update(): void {
@@ -83,7 +85,10 @@ export class ItemDropSystem {
 
   private pickupItem(player: BaseCharacter, item: DroppedItem): void {
     item.alive = false;
-    
+
+    // Stop the infinite glow pulse so it can't tick on a destroyed target
+    if (item.glowTween) { item.glowTween.stop(); item.glowTween.remove(); item.glowTween = undefined; }
+
     // Pickup animation
     this.scene.tweens.add({
       targets: item.gfx,
@@ -128,6 +133,7 @@ export class ItemDropSystem {
 
   clear(): void {
     for (const item of this.items) {
+      if (item.glowTween) { item.glowTween.stop(); item.glowTween.remove(); }
       if (item.alive) item.gfx.destroy();
     }
     this.items = [];
