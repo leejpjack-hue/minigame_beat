@@ -194,6 +194,7 @@ export class CharacterSelectScene extends Phaser.Scene {
   private startGame(): void {
     const p1 = ALL_FIGHTERS[this.p1Index];
     this.registry.set('selectedFighterP1', p1);
+    this.registry.set('score', 0); // Reset score on new game
 
     if (this.mode === '2p') {
       const p2 = ALL_FIGHTERS[this.p2Index];

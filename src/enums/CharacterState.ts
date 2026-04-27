@@ -6,6 +6,7 @@ export const CharacterState = {
   Hurt: 'hurt',
   Dead: 'dead',
   Block: 'block',
+  Dash: 'dash',
 } as const;
 
 export type CharacterStateType = (typeof CharacterState)[keyof typeof CharacterState];

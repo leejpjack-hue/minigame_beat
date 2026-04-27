@@ -17,6 +17,8 @@ const COMBO_DEFINITIONS: ComboDefinition[] = [
   { name: 'Up Special', sequence: [ComboInput.Up, ComboInput.Heavy], action: 'special_up' },
   { name: 'Dash Attack', sequence: [ComboInput.Right, ComboInput.Right, ComboInput.Attack], action: 'dash_attack' },
   { name: 'Dash Attack Left', sequence: [ComboInput.Left, ComboInput.Left, ComboInput.Attack], action: 'dash_attack' },
+  { name: 'Dash Right', sequence: [ComboInput.Right, ComboInput.Right], action: 'dash_right' },
+  { name: 'Dash Left', sequence: [ComboInput.Left, ComboInput.Left], action: 'dash_left' },
 ];
 
 export class ComboParser {

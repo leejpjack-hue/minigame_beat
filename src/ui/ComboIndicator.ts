@@ -67,6 +67,20 @@ export class ComboIndicator {
       ease: 'Back.easeOut',
     });
 
+    if (this.comboCount >= 10) {
+      // Add a cool shake effect for godlike combos
+      this.scene.tweens.add({
+        targets: this.comboText,
+        x: GAME_WIDTH / 2 + (Math.random() > 0.5 ? 5 : -5),
+        yoyo: true,
+        repeat: 3,
+        duration: 40,
+        onComplete: () => this.comboText.setX(GAME_WIDTH / 2)
+      });
+      // And a quick subtle flash of the screen
+      this.scene.cameras.main.flash(100, 255, 200, 0, false);
+    }
+
     // Float up slightly
     this.scene.tweens.add({
       targets: this.comboText,

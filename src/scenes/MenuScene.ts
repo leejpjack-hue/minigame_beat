@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { SceneKeys } from '../enums/SceneKeys';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config/constants';
+import { ALL_FIGHTERS } from '../characters/fighters';
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -20,6 +21,18 @@ export class MenuScene extends Phaser.Scene {
 
     // Background
     this.cameras.main.setBackgroundColor('#1a0a2e');
+
+    // Menu background animation (moving character silhouettes)
+    // Initial spawns to populate screen
+    for (let i = 0; i < 3; i++) {
+      this.spawnSilhouette();
+    }
+    // Continuous spawns
+    this.time.addEvent({
+      delay: 2000,
+      callback: () => this.spawnSilhouette(),
+      loop: true
+    });
 
     // Title
     const title = this.add.text(cx, cy - 60, '尋秦記齊打交', {
@@ -72,6 +85,37 @@ export class MenuScene extends Phaser.Scene {
     this.input.on('pointerdown', () => {
       this.sound.play('ui_confirm');
       this.scene.start(SceneKeys.CharacterSelect);
+    });
+  }
+
+  private spawnSilhouette(): void {
+    if (!this.scene.isActive(SceneKeys.Menu)) return;
+    
+    const isRightToLeft = Math.random() > 0.5;
+    const startX = isRightToLeft ? GAME_WIDTH + 50 : -50;
+    const endX = isRightToLeft ? -50 : GAME_WIDTH + 50;
+    const startY = GAME_HEIGHT - 60 + (Math.random() * 40 - 20);
+
+    const fighter = ALL_FIGHTERS[Math.floor(Math.random() * ALL_FIGHTERS.length)];
+    const tex = fighter.spriteKey + '_walk';
+    if (!this.textures.exists(tex)) return; // Failsafe
+
+    const silhouette = this.add.image(startX, startY, tex);
+    silhouette.setOrigin(0.5, 1);
+    silhouette.setFlipX(!isRightToLeft);
+    silhouette.setTint(0x0a001a); // Very dark, matching background
+    silhouette.setAlpha(0.6);
+    // Lower depth than UI text
+    silhouette.setDepth(10);
+
+    // Random speed variation
+    const duration = 6000 + Math.random() * 4000;
+
+    this.tweens.add({
+      targets: silhouette,
+      x: endX,
+      duration: duration,
+      onComplete: () => silhouette.destroy()
     });
   }
 }

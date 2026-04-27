@@ -5,6 +5,7 @@ import { AIController } from './AIController';
 import { ZDepthSorter } from './ZDepthSorter';
 import { CombatSystem } from './CombatSystem';
 import { ProjectileSystem } from './ProjectileSystem';
+import { ItemDropSystem } from './ItemDropSystem';
 import { ENEMY_TYPES, ENEMY_HITBOXES, EnemyTypeId } from '../characters/enemies/EnemyTypes';
 import { BossCharacter } from '../characters/enemies/BossCharacter';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config/constants';
@@ -134,6 +135,8 @@ export class StageManager {
   private zDepthSorter: ZDepthSorter;
   private combatSystem: CombatSystem;
   private projectiles: ProjectileSystem;
+  private itemDrops: ItemDropSystem;
+  private deadEnemies = new Set<EnemyCharacter>();
   private waveText!: Phaser.GameObjects.Text;
   private advancePrompt!: Phaser.GameObjects.Text;
   private stageComplete = false;
@@ -154,6 +157,7 @@ export class StageManager {
     this.zDepthSorter = zDepthSorter;
     this.combatSystem = combatSystem;
     this.projectiles = projectiles;
+    this.itemDrops = new ItemDropSystem(scene, players);
 
     this.waveText = scene.add.text(GAME_WIDTH / 2, 120, '', {
       fontSize: '24px', fontFamily: 'monospace', color: '#ffdd00', stroke: '#000', strokeThickness: 3,
@@ -194,7 +198,29 @@ export class StageManager {
   }
 
   update(time: number, delta: number): void {
-    for (const enemy of this.enemies) if (enemy.isAlive) enemy.update(time, delta);
+    this.itemDrops.update();
+
+    for (const enemy of this.enemies) {
+      if (enemy.isAlive) {
+        enemy.update(time, delta);
+      } else if (!this.deadEnemies.has(enemy)) {
+        this.deadEnemies.add(enemy);
+        
+        // Score System: points per kill, scaled by combo
+        const combo = this.combatSystem.getHitCounter();
+        const basePoints = 100;
+        const comboMultiplier = 1 + (combo * 0.1); // +10% per hit in combo
+        const points = Math.floor(basePoints * comboMultiplier);
+        let currentScore = this.scene.registry.get('score') || 0;
+        this.scene.registry.set('score', currentScore + points);
+
+        // 25% chance to drop an item
+        if (Math.random() < 0.25) {
+          const type = Math.random() < 0.5 ? 'hp' : 'mp';
+          this.itemDrops.spawnItem(enemy.x, enemy.groundY, type);
+        }
+      }
+    }
     for (const ai of this.aiControllers) ai.update(time, delta);
 
     // Clamp alive enemies to current section so knockback can't fling them off-stage
@@ -246,7 +272,18 @@ export class StageManager {
 
     for (const enemyDef of wave.enemies) {
       const typeDef = ENEMY_TYPES[enemyDef.type];
-      const stats = { ...typeDef.stats, ...enemyDef.stats };
+      
+      // Difficulty Scaling: Increase stats based on stage index
+      const stageIndex = ALL_STAGES.indexOf(this.config);
+      const diffMul = 1 + Math.max(0, stageIndex) * 0.2; // +20% stats per stage
+      
+      const baseStats = { ...typeDef.stats, ...enemyDef.stats };
+      const stats = {
+        ...baseStats,
+        maxHp: Math.floor((baseStats.maxHp ?? 100) * diffMul),
+        attackPower: Math.floor((baseStats.attackPower ?? 10) * diffMul),
+      };
+      
       const worldX = baseX + enemyDef.x;
       let enemy: EnemyCharacter;
       if (enemyDef.type === 'boss_lao') {
@@ -326,5 +363,9 @@ export class StageManager {
     return best;
   }
 
-  destroy(): void { this.waveText?.destroy(); this.advancePrompt?.destroy(); }
+  destroy(): void { 
+    this.waveText?.destroy(); 
+    this.advancePrompt?.destroy(); 
+    this.itemDrops.clear();
+  }
 }

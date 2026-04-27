@@ -35,6 +35,11 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
   private jumpDuration = 0;
   private jumpElapsed = 0;
 
+  // Dash
+  dashDuration = 0;
+  dashElapsed = 0;
+  dashDir = 1;
+
   // State machine
   stateMachine: StateMachine<CharacterStateType>;
 
@@ -153,8 +158,9 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
       // Absorb: take damage but do not interrupt
       const absorb = Math.max(1, Math.floor((amount - this.defensePower) * 0.5));
       this.hp = Math.max(0, this.hp - absorb);
-      this.bodySprite.setTint(0xff8888);
+      this.bodySprite.setTintFill(0xffffff);
       this.scene.time.delayedCall(80, () => { if (this.bodySprite) this.bodySprite.clearTint(); });
+      this.spawnDamageNumber(absorb);
       if (this.hp <= 0) this.stateMachine.forceTransition(CharacterState.Dead);
       return;
     }
@@ -163,6 +169,15 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
     this.hp = Math.max(0, this.hp - finalDamage);
     this.knockbackX = knockbackX;
     this.knockbackY = knockbackY;
+
+    // Hit flash effect
+    this.bodySprite.setTintFill(0xffffff);
+    this.scene.time.delayedCall(100, () => {
+      if (this.bodySprite) this.bodySprite.clearTint();
+    });
+
+    // Damage number popup
+    this.spawnDamageNumber(finalDamage);
 
     if (this.hp <= 0) {
       this.scene.sound.play('voice_ko');
@@ -177,6 +192,34 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
       this.bodySprite.setTint(0xffffff);
       this.scene.time.delayedCall(100, () => { if (this.bodySprite) this.bodySprite.clearTint(); });
     }
+  }
+
+  private spawnDamageNumber(damage: number): void {
+    const isCrit = damage >= 25;
+    const size = isCrit ? '24px' : '16px';
+    const color = isCrit ? '#ff4444' : '#ffffff';
+    
+    const damageText = this.scene.add.text(this.x, this.y - this.stats.height - 10, damage.toString(), {
+      fontSize: size,
+      fontFamily: 'monospace',
+      color: color,
+      stroke: '#000000',
+      strokeThickness: 3,
+      fontStyle: isCrit ? 'bold' : 'normal'
+    }).setOrigin(0.5).setDepth(2000);
+
+    const xOffset = (Math.random() - 0.5) * 40;
+    
+    this.scene.tweens.add({
+      targets: damageText,
+      x: damageText.x + xOffset,
+      y: damageText.y - 40,
+      alpha: 0,
+      scale: isCrit ? 1.5 : 1,
+      duration: 600,
+      ease: 'Cubic.easeOut',
+      onComplete: () => damageText.destroy()
+    });
   }
 
   // Sword-light trail emitter state (active while attacking with sword-wielding fighters)
@@ -200,8 +243,10 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
     const ring = this.scene.add.circle(this.x, this.groundY - 4, startR, color, 0);
     ring.setStrokeStyle(3, color, 0.9);
     ring.setDepth(50);
+    // Tween scale (not radius) to avoid Arc.geom null-deref if the scene tears down mid-tween
+    const scaleEnd = endR / Math.max(1, startR);
     this.scene.tweens.add({
-      targets: ring, radius: endR, alpha: 0, duration: dur, ease: 'Cubic.easeOut',
+      targets: ring, scaleX: scaleEnd, scaleY: scaleEnd, alpha: 0, duration: dur, ease: 'Cubic.easeOut',
       onComplete: () => ring.destroy(),
     });
   }
@@ -244,7 +289,7 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
     const glow = this.scene.add.circle(cx, cy, 6, 0xffffff, 0.9);
     glow.setDepth(this.groundY + 4);
     this.scene.tweens.add({
-      targets: glow, radius: 2, alpha: 0, duration: 160,
+      targets: glow, scaleX: 0.33, scaleY: 0.33, alpha: 0, duration: 160,
       onComplete: () => glow.destroy(),
     });
   }
@@ -275,14 +320,15 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
   /** Dark teleport puff for backstab. */
   private fxShadowPuff(): void {
     for (let i = 0; i < 10; i++) {
+      const startR = 6 + Math.random() * 4;
       const puff = this.scene.add.circle(
         this.x + (Math.random() - 0.5) * 30,
         this.groundY - 20 - Math.random() * 30,
-        6 + Math.random() * 4, 0x442266, 0.8,
+        startR, 0x442266, 0.8,
       );
       puff.setDepth(this.groundY + 2);
       this.scene.tweens.add({
-        targets: puff, radius: 14, alpha: 0,
+        targets: puff, scaleX: 14 / startR, scaleY: 14 / startR, alpha: 0,
         duration: 360, ease: 'Quad.easeOut',
         onComplete: () => puff.destroy(),
       });
@@ -295,7 +341,7 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
     aura.setDepth(this.groundY + 1);
     aura.setStrokeStyle(2, 0xffee88, 0.9);
     this.scene.tweens.add({
-      targets: aura, radius: 70, alpha: 0,
+      targets: aura, scaleX: 70 / 30, scaleY: 70 / 30, alpha: 0,
       duration: 500, ease: 'Cubic.easeOut',
       onComplete: () => aura.destroy(),
     });
@@ -361,12 +407,28 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
         this.scene.cameras.main.shake(200, 0.012);
         this.scene.cameras.main.flash(180, 255, 240, 180);
         this.fxChargeRing(color, 20, 80, 500);
+
+        // Dynamic camera zoom on super moves
+        this.scene.cameras.main.zoomTo(1.3, 200, 'Sine.easeOut', true);
+        this.scene.time.delayedCall(800, () => {
+          this.scene.cameras.main.zoomTo(1, 400, 'Sine.easeInOut', true);
+        });
         break;
       default:
         break;
     }
 
-    if (kind === 'special' && moveName !== 'super') {
+    if (moveName === 'super') {
+      this.scene.cameras.main.shake(150, 0.01);
+      this.scene.cameras.main.flash(200, 255, 200, 100);
+      this.fxChargeRing(color, 30, 100, 600);
+      
+      // Dynamic camera zoom on super moves
+      this.scene.cameras.main.zoomTo(1.3, 200, 'Sine.easeOut', true);
+      this.scene.time.delayedCall(800, () => {
+        this.scene.cameras.main.zoomTo(1, 400, 'Sine.easeInOut', true);
+      });
+    } else if (kind === 'special' && moveName !== 'super') {
       this.scene.cameras.main.shake(80, 0.004);
       this.scene.cameras.main.flash(90, 255, 200, 255);
     }
@@ -427,6 +489,30 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
     return true;
   }
 
+  performDash(direction: 1 | -1): void {
+    const state = this.stateMachine.currentState;
+    if (state === CharacterState.Dead || state === CharacterState.Hurt || state === CharacterState.Dash) return;
+    
+    // Dash cancel attack!
+    if (state === CharacterState.Attack) {
+      this.currentAttackName = '';
+      this.isHitboxActive = false;
+      this.travelDuration = 0;
+      this.superArmorActive = false;
+      this.scene.cameras.main.flash(50, 200, 255, 255);
+    }
+    
+    this.dashDuration = 300;
+    this.dashElapsed = 0;
+    this.dashDir = direction;
+    this.facing = direction === 1 ? Direction.Right : Direction.Left;
+    this.invulnerable = true;
+    this.invulnerableTimer = 300;
+    
+    this.stateMachine.forceTransition(CharacterState.Dash);
+    this.scene.sound.play('sfx_slash', { volume: 0.2 });
+  }
+
   applySelfBuff(atkMul: number, duration: number): void {
     this.atkMultiplier = atkMul;
     this.atkBuffTimer = duration;
@@ -435,6 +521,14 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
 
   update(time: number, delta: number): void {
     this.stateMachine.update(time, delta);
+
+    // MP Regeneration
+    if (this.isAlive) {
+      const regenRate = this.stats.mpRegenRate ?? 0;
+      if (regenRate > 0 && this.mp < this.maxMp) {
+        this.mp = Math.min(this.maxMp, this.mp + regenRate * (delta / 1000));
+      }
+    }
 
     // Light-chain window decay
     if (this.lightChainWindow > 0) {
@@ -469,6 +563,41 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
       if (Math.abs(this.knockbackY) < 1) this.knockbackY = 0;
     }
 
+    // Dash motion
+    if (this.stateMachine.currentState === CharacterState.Dash) {
+      this.dashElapsed += delta;
+      const speedMultiplier = 2.5; // Dash is faster than walking
+      this.x += this.dashDir * this.speed * speedMultiplier * (delta / 1000);
+      
+      // Afterimage effect
+      if (Math.random() > 0.4) {
+        const ghost = this.scene.add.image(this.x, this.y, this.bodySprite.texture.key);
+        ghost.setFlipX(this.facing === Direction.Left);
+        ghost.setOrigin(0.5, 1).setDepth(this.groundY - 1).setAlpha(0.5).setTint(0x88ccff);
+        this.scene.tweens.add({ targets: ghost, alpha: 0, duration: 250, onComplete: () => ghost.destroy() });
+      }
+
+      if (this.dashElapsed >= this.dashDuration) {
+        this.stateMachine.transition(CharacterState.Idle);
+      }
+    }
+
+    // Dust particles on walk/dash
+    if ((this.stateMachine.currentState === CharacterState.Walk || this.stateMachine.currentState === CharacterState.Dash) && this.isGrounded) {
+      if (Math.random() > 0.7) { // 30% chance per frame
+        const dust = this.scene.add.circle(this.x + (Math.random() - 0.5) * 16, this.groundY, 2 + Math.random() * 3, 0xaaaaaa, 0.6);
+        this.scene.physics.add.existing(dust);
+        const body = dust.body as Phaser.Physics.Arcade.Body;
+        if (body) {
+           body.setVelocityY(-10 - Math.random() * 20);
+           // Move dust opposite to facing direction
+           body.setVelocityX((this.facing === Direction.Left ? 1 : -1) * (10 + Math.random() * 20));
+        }
+        dust.setDepth(this.groundY + 1);
+        this.scene.tweens.add({ targets: dust, alpha: 0, scale: 2, duration: 400 + Math.random() * 200, onComplete: () => dust.destroy() });
+      }
+    }
+
     // Attack frame advance
     if (this.stateMachine.currentState === CharacterState.Attack) {
       this.attackFrame += delta;
@@ -482,6 +611,14 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
         const eased = 1 - Math.pow(1 - tFrac, 2); // ease-out
         const dir = this.facing === Direction.Right ? 1 : -1;
         this.x = this.travelStartX + this.travelDistance * eased * dir;
+      }
+
+      // Attack trail effect (semi-transparent afterimages)
+      if (Math.random() > 0.6) {
+        const ghost = this.scene.add.image(this.x, this.y, this.bodySprite.texture.key);
+        ghost.setFlipX(this.facing === Direction.Left);
+        ghost.setOrigin(0.5, 1).setDepth(this.groundY - 1).setAlpha(0.3).setTint(0xffaaaa);
+        this.scene.tweens.add({ targets: ghost, alpha: 0, duration: 250, onComplete: () => ghost.destroy() });
       }
 
       if (this.attackFrame >= this.attackTotalFrames) {
@@ -546,6 +683,7 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
     if (s === CharacterState.Walk) pose = 'walk';
     else if (s === CharacterState.Attack) pose = 'attack';
     else if (s === CharacterState.Jump) pose = 'walk';
+    else if (s === CharacterState.Dash) pose = 'walk';
     else if (s === CharacterState.Hurt) pose = 'idle';
     const desired = this.stats.spriteKey + '_' + pose;
     if (this.currentPoseKey === desired) return;

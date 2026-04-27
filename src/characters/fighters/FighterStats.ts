@@ -18,6 +18,7 @@ export interface FighterStats {
   height: number;
   // Optional gameplay perks
   doubleJump?: boolean;
+  mpRegenRate?: number; // MP per second
 }
 
 export const DEFAULT_STATS: FighterStats = {
@@ -35,4 +36,5 @@ export const DEFAULT_STATS: FighterStats = {
   color: 0x888888,
   width: 30,
   height: 46,
+  mpRegenRate: 5,
 };

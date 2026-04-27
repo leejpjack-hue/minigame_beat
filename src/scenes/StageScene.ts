@@ -14,6 +14,7 @@ import { VirtualDpad } from '../ui/VirtualDpad';
 import { StageManager, ALL_STAGES } from '../systems/StageManager';
 import { FighterStats } from '../characters/fighters/FighterStats';
 import { XiangShaoLongStats } from '../characters/fighters/XiangShaoLong';
+import { BreakableObject } from '../characters/BreakableObject';
 
 export class StageScene extends Phaser.Scene {
   private player!: PlayerCharacter;
@@ -34,6 +35,7 @@ export class StageScene extends Phaser.Scene {
   private touchDy = 0;
   private currentStageIndex = 0;
   private cameraTracker!: Phaser.GameObjects.Zone;
+  private breakables: BreakableObject[] = [];
 
   // P1 keys
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -142,6 +144,7 @@ export class StageScene extends Phaser.Scene {
     }
 
     // Interactive/Mid-ground Details (Stalls, Lanterns, Banners)
+    this.breakables = [];
     for (let i = 0; i < stageConfig.waves.length * 5; i++) {
       const tx = Math.random() * stageWidth;
       const ty = STAGE_WALKABLE_Y_MIN - 5;
@@ -149,9 +152,13 @@ export class StageScene extends Phaser.Scene {
 
       if (stageName === 'Xianyang Streets') {
         if (rand > 0.7) {
-          this.add.image(tx, ty, Math.random() > 0.5 ? 'bg_stall_blue' : 'bg_stall_red').setOrigin(0.5, 1).setDepth(-4).setScrollFactor(0.9);
+          const key = Math.random() > 0.5 ? 'bg_stall_blue' : 'bg_stall_red';
+          const obj = new BreakableObject(this, tx, ty, key, 30);
+          this.breakables.push(obj);
         } else if (rand > 0.4) {
-          this.add.image(tx, ty - 80, 'bg_lantern').setOrigin(0.5, 0).setDepth(-4).setScrollFactor(0.9);
+          const obj = new BreakableObject(this, tx, ty - 80, 'bg_lantern', 1);
+          obj.groundY = ty; // Anchor for z-depth
+          this.breakables.push(obj);
         } else {
           this.add.image(tx, ty, 'bg_banner_qin').setOrigin(0.5, 1).setDepth(-4).setScrollFactor(0.9);
         }
@@ -159,15 +166,47 @@ export class StageScene extends Phaser.Scene {
         if (rand > 0.6) {
           this.add.image(tx, ty, 'bg_banner_zhao').setOrigin(0.5, 1).setDepth(-4).setScrollFactor(0.9);
         } else {
-          this.add.image(tx, ty - 80, 'bg_lantern').setOrigin(0.5, 0).setDepth(-4).setScrollFactor(0.9);
+          const obj = new BreakableObject(this, tx, ty - 80, 'bg_lantern', 1);
+          obj.groundY = ty;
+          this.breakables.push(obj);
         }
       } else if (stageName === 'Qin Border Wall' || stageName === 'Qin Throne Room') {
         if (rand > 0.5) {
           this.add.image(tx, ty, 'bg_banner_qin').setOrigin(0.5, 1).setDepth(-4).setScrollFactor(0.9);
         } else if (stageName === 'Qin Throne Room' && rand > 0.2) {
-          this.add.image(tx, ty - 100, 'bg_lantern').setOrigin(0.5, 0).setScale(1.5).setDepth(-4).setScrollFactor(0.9);
+          const obj = new BreakableObject(this, tx, ty - 100, 'bg_lantern', 1);
+          obj.groundY = ty;
+          this.breakables.push(obj);
         }
       }
+    }
+
+    // Weather Effects (Stage 3 - Qin Border Wall)
+    if (stageName === 'Qin Border Wall') {
+      const mist = this.add.particles(0, 0, 'bg_cloud', {
+        x: { min: 0, max: stageWidth },
+        y: { min: 0, max: GAME_HEIGHT },
+        lifespan: 10000,
+        speedX: { min: -20, max: 20 },
+        speedY: { min: -5, max: 5 },
+        scale: { start: 1, end: 2 },
+        alpha: { start: 0, end: 0.1 },
+        frequency: 500,
+        blendMode: 'ADD'
+      });
+      mist.setDepth(2000).setScrollFactor(0.5);
+
+      const snow = this.add.particles(0, -50, 'bg_cloud', { // Using small clouds as snowflakes
+        x: { min: 0, max: stageWidth },
+        y: 0,
+        lifespan: 6000,
+        speedX: { min: -50, max: 50 },
+        speedY: { min: 100, max: 200 },
+        scale: { min: 0.05, max: 0.15 },
+        alpha: { start: 0.6, end: 0 },
+        frequency: 100,
+      });
+      snow.setDepth(2000).setScrollFactor(0.8);
     }
 
     // Floor Detail (Stones on the ground)
@@ -219,6 +258,12 @@ export class StageScene extends Phaser.Scene {
 
     this.stageManager = new StageManager(this, stageConfig, players, this.zDepthSorter, this.combatSystem, this.projectiles);
     this.stageManager.startFirstWave();
+
+    // Register breakables with systems
+    for (const obj of this.breakables) {
+      this.zDepthSorter.addCharacter(obj);
+      this.combatSystem.addCharacter(obj);
+    }
 
     // Camera: bounds span full stage, follow invisible tracker = midpoint of alive players
     this.cameras.main.setBounds(0, 0, stageWidth, GAME_HEIGHT);
@@ -305,12 +350,17 @@ export class StageScene extends Phaser.Scene {
       this.player2.update(time, delta);
     }
 
+    for (const obj of this.breakables) {
+      if (obj.isAlive) obj.update(time, delta);
+    }
+
     this.stageManager.update(time, delta);
     this.combatSystem.update(time, delta);
     this.projectiles.update(delta, () => this.getAllCharacters());
     this.stonePickup.update();
     this.zDepthSorter.update();
     this.hud.update(this.player, this.stageManager.aliveEnemies, this.combatSystem.getHitCounter(), delta, this.player2);
+    this.hud.updateScore(this.registry.get('score') || 0);
 
     // Clamp players: cannot walk past the section gate while a wave is active, and cannot leave stage bounds
     const stageWidth = this.stageManager.stageWidth;
@@ -359,7 +409,7 @@ export class StageScene extends Phaser.Scene {
   private getAllCharacters(): BaseCharacter[] {
     const chars: BaseCharacter[] = [this.player];
     if (this.player2) chars.push(this.player2);
-    return chars.concat(this.stageManager.aliveEnemies);
+    return chars.concat(this.stageManager.aliveEnemies).concat(this.breakables.filter(b => b.isAlive));
   }
 
   // --- P1 Input (WASD + J/K/Space/L) ---

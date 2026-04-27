@@ -8,6 +8,7 @@ export class StageHUD {
   private playerHpBar!: HealthBar;
   private playerMpBar!: MPBar;
   private playerLabel!: Phaser.GameObjects.Text;
+  private scoreText!: Phaser.GameObjects.Text;
 
   // P2
   private player2HpBar: HealthBar | null = null;
@@ -35,6 +36,11 @@ export class StageHUD {
         fontSize: '12px', color: tagColor, fontFamily: 'monospace',
         stroke: '#000', strokeThickness: 2,
       }).setDepth(900).setScrollFactor(0);
+      
+      this.scoreText = this.scene.add.text(GAME_WIDTH - 20, 10, 'SCORE: 0', {
+        fontSize: '20px', color: '#ffdd00', fontFamily: 'monospace',
+        stroke: '#000', strokeThickness: 3,
+      }).setOrigin(1, 0).setDepth(900).setScrollFactor(0);
     } else {
       this.player2HpBar = new HealthBar(this.scene, 20, yOff, 200, 14, char.maxHp);
       this.player2MpBar = new MPBar(this.scene, 20, yOff + 22, 160, 10, char.maxMp);
@@ -68,6 +74,12 @@ export class StageHUD {
     this.comboIndicator.update(delta);
   }
 
+  updateScore(score: number): void {
+    if (this.scoreText) {
+      this.scoreText.setText(`SCORE: ${score}`);
+    }
+  }
+
   registerHit(): number {
     return this.comboIndicator.registerHit();
   }
@@ -85,5 +97,6 @@ export class StageHUD {
     this.comboIndicator.destroy();
     this.playerLabel?.destroy();
     this.player2Label?.destroy();
+    this.scoreText?.destroy();
   }
 }

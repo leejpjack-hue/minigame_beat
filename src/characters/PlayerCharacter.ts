@@ -45,7 +45,14 @@ export class PlayerCharacter extends BaseCharacter {
       canTransitionFrom: [CharacterState.Idle, CharacterState.Walk],
       onEnter: () => {
         this.stateLabel.setColor('#44aaff');
-        this.counterWindow = 200;
+        this.superArmorActive = true;
+      },
+      onExit: () => { this.superArmorActive = false; },
+    });
+    this.stateMachine.addState(CharacterState.Dash, {
+      canTransitionFrom: [CharacterState.Idle, CharacterState.Walk, CharacterState.Attack, CharacterState.Block],
+      onEnter: () => {
+        this.stateLabel.setColor('#00ffff');
       },
     });
   }
@@ -138,6 +145,15 @@ export class PlayerCharacter extends BaseCharacter {
 
   /** Dispatch special-move name keyed per fighter */
   executeCombo(comboName: string): void {
+    if (comboName === 'dash_right') {
+      this.performDash(1);
+      return;
+    }
+    if (comboName === 'dash_left') {
+      this.performDash(-1);
+      return;
+    }
+
     const moves = getFighterMoves(String(this.stats.fighterKey));
     if (!moves) return;
 

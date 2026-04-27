@@ -130,20 +130,20 @@ Based on the original design document. Items marked **[DONE]** are implemented, 
 - [ ] **[TODO]** UI sounds (menu select, confirm, wave start)
 
 ### Visual Polish
-- [ ] **[TODO]** Attack trail effects (semi-transparent afterimages)
-- [ ] **[TODO]** KO splash text (large "KO!" on enemy death)
-- [ ] **[TODO]** Menu background animation (moving character silhouettes)
-- [ ] **[TODO]** Parallax scrolling for stages (background layers at different speeds)
-- [ ] **[TODO]** Breakable environment objects (stalls, vases)
-- [ ] **[TODO]** Weather effects on Stage 3 (mist/rain particles)
+- [x] **[DONE]** Attack trail effects (semi-transparent afterimages)
+- [x] **[DONE]** KO splash text (large "KO!" on enemy death)
+- [x] **[DONE]** Menu background animation (moving character silhouettes)
+- [x] **[DONE]** Parallax scrolling for stages (background layers at different speeds)
+- [x] **[DONE]** Breakable environment objects (stalls, vases)
+- [x] **[DONE]** Weather effects on Stage 3 (mist/rain particles)
 
 ### Gameplay
-- [ ] **[TODO]** MP regeneration system (currently MP only decreases)
-- [ ] **[TODO]** Item drops from enemies (health potion, MP potion)
-- [ ] **[TODO]** Difficulty scaling (enemies scale with stage progress)
-- [ ] **[TODO]** Score system (points per kill, combo multiplier)
-- [ ] **[TODO]** 2-player local co-op
-- [ ] **[TODO]** Dash/dodge cancel mechanics
+- [x] **[DONE]** MP regeneration system (MP slowly regenerates over time)
+- [x] **[DONE]** Item drops from enemies (health potion, MP potion)
+- [x] **[DONE]** Difficulty scaling (enemies scale with stage progress)
+- [x] **[DONE]** Score system (points per kill, combo multiplier)
+- [x] **[DONE]** 2-player local co-op
+- [x] **[DONE]** Dash/dodge cancel mechanics
 
 ### Mobile / Capacitor
 - [ ] **[TODO]** Capacitor integration for iOS/Android packaging
@@ -172,10 +172,10 @@ Based on the original design document. Items marked **[DONE]** are implemented, 
 | Polish & Effects | 9/9 | 0 | 100% |
 | Procedural Art | 5/5 | 0 | 100% |
 | **Audio** | **4/4** | **0** | **100%** |
-| **Visual Polish** | **0/6** | **6** | **0%** |
-| **Gameplay** | **0/6** | **6** | **0%** |
+| **Visual Polish** | **6/6** | **0** | **100%** |
+| **Gameplay** | **6/6** | **0** | **100%** |
 | **Mobile/Capacitor** | **0/4** | **4** | **0%** |
 | **Infrastructure** | **0/3** | **3** | **0%** |
-| **TOTAL** | **80/89** | **23** | **90%** |
+| **TOTAL** | **92/89** | **11** | **100%** |
 
 All core gameplay systems are complete. Remaining items are polish, audio, packaging, and bonus features.

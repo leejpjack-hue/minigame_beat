@@ -51,6 +51,23 @@ export class EnemyCharacter extends BaseCharacter {
       onEnter: () => {
         this.stateLabel.setColor('#666666');
         this.bodySprite.setTint(0x666666);
+        
+        // KO splash text
+        const koText = this.scene.add.text(this.x, this.y - 40, 'KO!', {
+          fontSize: '48px', fontFamily: 'monospace', color: '#ff2222',
+          stroke: '#ffffff', strokeThickness: 4, fontStyle: 'bold'
+        }).setOrigin(0.5).setDepth(2000);
+        
+        this.scene.tweens.add({
+          targets: koText,
+          y: koText.y - 50,
+          scale: 1.5,
+          alpha: 0,
+          duration: 1000,
+          ease: 'Power2',
+          onComplete: () => koText.destroy()
+        });
+
         this.scene.tweens.add({
           targets: this, alpha: 0, duration: 1000, delay: 500,
           onComplete: () => this.destroy(),
