@@ -65,7 +65,7 @@ export class BootScene extends Phaser.Scene {
       { key: 'sprite_enemy_archer',    w: 30, h: 44, main: '#8a6a3a', accent: '#3a2a1a', weapon: 'bow',    hair: 'helmet' },
       { key: 'sprite_enemy_spearman',  w: 34, h: 48, main: '#aa3333', accent: '#222222', weapon: 'spear',  hair: 'helmet' },
       { key: 'sprite_enemy_shieldman', w: 36, h: 48, main: '#aa7733', accent: '#553311', weapon: 'shield_axe', hair: 'helmet' },
-      { key: 'sprite_enemy_cavalry',   w: 42, h: 54, main: '#553322', accent: '#331a0a', weapon: 'cavalry', hair: 'helmet' },
+      { key: 'sprite_enemy_cavalry',   w: 72, h: 64, main: '#553322', accent: '#331a0a', weapon: 'cavalry', hair: 'helmet' },
       { key: 'sprite_enemy_elite',     w: 34, h: 48, main: '#cc9944', accent: '#332211', weapon: 'sword',  hair: 'helmet' },
       { key: 'sprite_enemy_general',   w: 42, h: 56, main: '#aa2222', accent: '#1a1a1a', weapon: 'sword',  hair: 'topknot' },
       { key: 'sprite_enemy_minilj',    w: 36, h: 50, main: '#2a1a2a', accent: '#cc2222', weapon: 'sword',  hair: 'topknot' },

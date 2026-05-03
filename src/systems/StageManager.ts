@@ -29,6 +29,7 @@ export interface StageConfig {
   waves: WaveConfig[];
 }
 
+// ---------- Stage 1 ----------
 const STAGE_1: StageConfig = {
   name: 'Xianyang Streets',
   nameZH: '咸陽城街道',
@@ -36,24 +37,44 @@ const STAGE_1: StageConfig = {
   groundColor: 0x3a2a1a,
   accentColor: 0x554433,
   waves: [
+    // 1: tutorial pair
     { enemies: [
       { x: 600, groundY: 330, type: 'soldier' },
-      { x: 650, groundY: 350, type: 'soldier' },
+      { x: 660, groundY: 350, type: 'soldier' },
     ]},
+    // 2: trio with ranged
     { enemies: [
-      { x: 550, groundY: 320, type: 'soldier' },
+      { x: 540, groundY: 320, type: 'soldier' },
       { x: 600, groundY: 340, type: 'soldier' },
       { x: 700, groundY: 360, type: 'archer' },
     ]},
+    // 3: spearman threat
     { enemies: [
-      { x: 500, groundY: 310, type: 'soldier' },
-      { x: 550, groundY: 330, type: 'soldier' },
-      { x: 620, groundY: 350, type: 'shieldman' },
-      { x: 680, groundY: 340, type: 'elite' },
+      { x: 500, groundY: 320, type: 'soldier' },
+      { x: 560, groundY: 350, type: 'spearman' },
+      { x: 640, groundY: 330, type: 'soldier' },
+      { x: 700, groundY: 360, type: 'archer' },
+    ]},
+    // 4: shield + crossfire
+    { enemies: [
+      { x: 480, groundY: 310, type: 'shieldman' },
+      { x: 540, groundY: 340, type: 'soldier' },
+      { x: 620, groundY: 360, type: 'spearman' },
+      { x: 700, groundY: 320, type: 'archer' },
+      { x: 740, groundY: 360, type: 'archer' },
+    ]},
+    // 5: stage-1 mini-finale (elite anchors a squad)
+    { enemies: [
+      { x: 480, groundY: 320, type: 'soldier' },
+      { x: 540, groundY: 340, type: 'soldier' },
+      { x: 600, groundY: 360, type: 'shieldman' },
+      { x: 660, groundY: 330, type: 'spearman' },
+      { x: 720, groundY: 350, type: 'elite' },
     ]},
   ],
 };
 
+// ---------- Stage 2 ----------
 const STAGE_2: StageConfig = {
   name: 'Zhao Palace',
   nameZH: '趙國質子府',
@@ -61,25 +82,45 @@ const STAGE_2: StageConfig = {
   groundColor: 0x2a1a2a,
   accentColor: 0x443344,
   waves: [
+    // 1
     { enemies: [
       { x: 500, groundY: 330, type: 'soldier' },
       { x: 560, groundY: 350, type: 'spearman' },
       { x: 620, groundY: 320, type: 'archer' },
     ]},
+    // 2
     { enemies: [
       { x: 480, groundY: 310, type: 'spearman' },
-      { x: 550, groundY: 340, type: 'soldier' },
+      { x: 540, groundY: 340, type: 'soldier' },
       { x: 600, groundY: 360, type: 'shieldman' },
       { x: 680, groundY: 330, type: 'archer' },
     ]},
+    // 3 — courtyard ambush
+    { enemies: [
+      { x: 480, groundY: 320, type: 'shieldman' },
+      { x: 540, groundY: 350, type: 'spearman' },
+      { x: 600, groundY: 320, type: 'soldier' },
+      { x: 660, groundY: 360, type: 'soldier' },
+      { x: 720, groundY: 320, type: 'archer' },
+    ]},
+    // 4 — elite + cavalry pressure
+    { enemies: [
+      { x: 460, groundY: 320, type: 'cavalry' },
+      { x: 560, groundY: 350, type: 'shieldman' },
+      { x: 620, groundY: 320, type: 'elite' },
+      { x: 700, groundY: 360, type: 'archer' },
+    ]},
+    // 5 — miniboss 連晉 + escort
     { enemies: [
       { x: 500, groundY: 340, type: 'miniboss_lj' },
-      { x: 620, groundY: 320, type: 'soldier' },
-      { x: 620, groundY: 360, type: 'soldier' },
+      { x: 600, groundY: 320, type: 'soldier' },
+      { x: 600, groundY: 360, type: 'soldier' },
+      { x: 700, groundY: 340, type: 'archer' },
     ]},
   ],
 };
 
+// ---------- Stage 3 ----------
 const STAGE_3: StageConfig = {
   name: 'Qin Border Wall',
   nameZH: '秦長城邊境',
@@ -87,43 +128,131 @@ const STAGE_3: StageConfig = {
   groundColor: 0x2a2a2a,
   accentColor: 0x444444,
   waves: [
+    // 1 — sentry post
     { enemies: [
       { x: 600, groundY: 330, type: 'soldier' },
       { x: 650, groundY: 340, type: 'spearman' },
       { x: 720, groundY: 350, type: 'archer' },
     ]},
+    // 2 — cavalry charge
     { enemies: [
       { x: 480, groundY: 310, type: 'cavalry' },
       { x: 720, groundY: 360, type: 'cavalry' },
       { x: 600, groundY: 340, type: 'shieldman' },
     ]},
+    // 3 — defensive line
+    { enemies: [
+      { x: 500, groundY: 320, type: 'shieldman' },
+      { x: 560, groundY: 350, type: 'spearman' },
+      { x: 620, groundY: 320, type: 'spearman' },
+      { x: 680, groundY: 360, type: 'archer' },
+      { x: 740, groundY: 330, type: 'archer' },
+    ]},
+    // 4 — heavy cavalry + elite
+    { enemies: [
+      { x: 460, groundY: 320, type: 'elite' },
+      { x: 540, groundY: 350, type: 'cavalry' },
+      { x: 640, groundY: 320, type: 'cavalry' },
+      { x: 720, groundY: 360, type: 'elite' },
+    ]},
+    // 5 — miniboss 圖先 + ranged support
     { enemies: [
       { x: 500, groundY: 340, type: 'miniboss_tx' },
       { x: 620, groundY: 320, type: 'spearman' },
       { x: 680, groundY: 360, type: 'archer' },
+      { x: 720, groundY: 320, type: 'archer' },
     ]},
   ],
 };
 
+// ---------- Stage 4 ----------
 const STAGE_4: StageConfig = {
-  name: 'Qin Throne Room',
-  nameZH: '秦王大殿',
+  name: 'Qin Throne Room Approach',
+  nameZH: '秦王大殿前殿',
   skyColor: 0x2a0a0a,
   groundColor: 0x3a1a0a,
   accentColor: 0x664422,
   waves: [
+    // 1 — elite welcome
     { enemies: [
       { x: 480, groundY: 330, type: 'elite' },
       { x: 560, groundY: 350, type: 'elite' },
       { x: 640, groundY: 320, type: 'shieldman' },
     ]},
+    // 2 — palace guard
+    { enemies: [
+      { x: 460, groundY: 320, type: 'shieldman' },
+      { x: 540, groundY: 350, type: 'elite' },
+      { x: 620, groundY: 320, type: 'spearman' },
+      { x: 700, groundY: 360, type: 'archer' },
+      { x: 740, groundY: 320, type: 'archer' },
+    ]},
+    // 3 — cavalry + elite squad
+    { enemies: [
+      { x: 460, groundY: 320, type: 'cavalry' },
+      { x: 540, groundY: 350, type: 'elite' },
+      { x: 620, groundY: 320, type: 'elite' },
+      { x: 700, groundY: 360, type: 'shieldman' },
+    ]},
+    // 4 — both minibosses converge
+    { enemies: [
+      { x: 460, groundY: 320, type: 'miniboss_lj' },
+      { x: 660, groundY: 360, type: 'miniboss_tx' },
+      { x: 600, groundY: 340, type: 'archer' },
+    ]},
+    // 5 — pre-boss general
+    { enemies: [
+      { x: 500, groundY: 340, type: 'boss' },
+      { x: 620, groundY: 320, type: 'shieldman' },
+      { x: 700, groundY: 360, type: 'elite' },
+    ]},
+  ],
+};
+
+// ---------- Stage 5 (final) ----------
+const STAGE_5: StageConfig = {
+  name: 'Qin Throne Room',
+  nameZH: '秦王大殿',
+  skyColor: 0x300505,
+  groundColor: 0x4a1a0a,
+  accentColor: 0xffaa44,
+  waves: [
+    // 1 — royal honor guard
+    { enemies: [
+      { x: 480, groundY: 330, type: 'elite' },
+      { x: 560, groundY: 350, type: 'elite' },
+      { x: 640, groundY: 320, type: 'shieldman' },
+      { x: 720, groundY: 360, type: 'spearman' },
+    ]},
+    // 2 — cavalry storm the throne
+    { enemies: [
+      { x: 460, groundY: 320, type: 'cavalry' },
+      { x: 560, groundY: 360, type: 'cavalry' },
+      { x: 660, groundY: 320, type: 'cavalry' },
+      { x: 740, groundY: 350, type: 'elite' },
+    ]},
+    // 3 — twin generals
+    { enemies: [
+      { x: 460, groundY: 320, type: 'boss' },
+      { x: 700, groundY: 360, type: 'boss' },
+      { x: 580, groundY: 340, type: 'shieldman' },
+      { x: 640, groundY: 320, type: 'archer' },
+    ]},
+    // 4 — both minibosses + cavalry escort (last gauntlet)
+    { enemies: [
+      { x: 460, groundY: 320, type: 'miniboss_lj' },
+      { x: 700, groundY: 360, type: 'miniboss_tx' },
+      { x: 540, groundY: 340, type: 'cavalry' },
+      { x: 640, groundY: 340, type: 'cavalry' },
+    ]},
+    // 5 — final boss 嫪毐
     { enemies: [
       { x: 500, groundY: 340, type: 'boss_lao' },
     ]},
   ],
 };
 
-export const ALL_STAGES: StageConfig[] = [STAGE_1, STAGE_2, STAGE_3, STAGE_4];
+export const ALL_STAGES: StageConfig[] = [STAGE_1, STAGE_2, STAGE_3, STAGE_4, STAGE_5];
 
 export class StageManager {
   private scene: Phaser.Scene;

@@ -304,25 +304,176 @@ export class SpriteGenerator {
         break;
       }
       case 'cavalry': {
-        // horse silhouette under the rider
-        ctx.fillStyle = '#553322';
-        ctx.fillRect(handX - 20, handY + 16, 32, 8);
-        ctx.fillRect(handX - 18, handY + 24, 3, 6);
-        ctx.fillRect(handX + 8, handY + 24, 3, 6);
-        // lance
-        ctx.save();
-        ctx.translate(handX + 2, handY + 12);
-        ctx.rotate(-Math.PI / 8);
-        ctx.fillStyle = '#996633';
-        ctx.fillRect(-1, -26, 2, 26);
-        ctx.fillStyle = '#cccccc';
+        // ---- Detailed war horse beneath the rider ----
+        // Anchor: rider's torso bottom roughly handY + 14 .. + 22.
+        // Horse top sits just below where the rider's legs would end.
+        const hx = handX - 4;        // horse center-x (slightly left of rider hand)
+        const hy = handY + 22;       // horse withers (top of body)
+
+        // Body — rounded chestnut bay with a darker belly
+        ctx.fillStyle = '#5a3a1a';
         ctx.beginPath();
-        ctx.moveTo(0, -30);
-        ctx.lineTo(-2, -24);
-        ctx.lineTo(2, -24);
+        ctx.ellipse(hx, hy + 5, 26, 9, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Underbelly shadow
+        ctx.fillStyle = '#3a2210';
+        ctx.beginPath();
+        ctx.ellipse(hx, hy + 8, 22, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Hindquarters (rear bulge, more pronounced)
+        ctx.fillStyle = '#5a3a1a';
+        ctx.beginPath();
+        ctx.ellipse(hx + 18, hy + 4, 11, 9, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Chest (front bulge)
+        ctx.beginPath();
+        ctx.ellipse(hx - 18, hy + 4, 10, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Neck — angled forward+down
+        ctx.save();
+        ctx.translate(hx - 22, hy + 2);
+        ctx.rotate(-Math.PI / 7);
+        ctx.fillStyle = '#5a3a1a';
+        ctx.fillRect(-3, -10, 9, 14);
+        ctx.restore();
+
+        // Head — wedge with muzzle
+        const headX = hx - 28;
+        const headY = hy - 6;
+        ctx.fillStyle = '#5a3a1a';
+        ctx.beginPath();
+        ctx.moveTo(headX,     headY);
+        ctx.lineTo(headX - 8, headY + 3);
+        ctx.lineTo(headX - 9, headY + 8);
+        ctx.lineTo(headX - 4, headY + 9);
+        ctx.lineTo(headX + 2, headY + 5);
         ctx.closePath();
         ctx.fill();
+        // Snout shading
+        ctx.fillStyle = '#3a2210';
+        ctx.fillRect(headX - 9, headY + 7, 5, 2);
+        // Eye
+        ctx.fillStyle = '#000';
+        ctx.fillRect(headX - 3, headY + 3, 1.5, 1.5);
+        // Ear (perked)
+        ctx.fillStyle = '#5a3a1a';
+        ctx.beginPath();
+        ctx.moveTo(headX + 1, headY - 1);
+        ctx.lineTo(headX + 3, headY - 5);
+        ctx.lineTo(headX + 4, headY - 1);
+        ctx.closePath();
+        ctx.fill();
+        // Bridle strap (gold accent)
+        ctx.strokeStyle = '#c89030';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(headX - 7, headY + 5);
+        ctx.lineTo(headX + 1, headY + 4);
+        ctx.stroke();
+
+        // Mane — flowing along the neck and upper back
+        ctx.fillStyle = '#1a0a05';
+        ctx.beginPath();
+        ctx.moveTo(hx - 16, hy - 4);
+        ctx.lineTo(hx - 22, hy - 1);
+        ctx.lineTo(hx - 24, hy + 5);
+        ctx.lineTo(hx - 18, hy + 1);
+        ctx.lineTo(hx - 14, hy + 2);
+        ctx.lineTo(hx - 8,  hy);
+        ctx.closePath();
+        ctx.fill();
+        // Mane streaks
+        ctx.fillRect(hx - 20, hy - 1, 2, 4);
+        ctx.fillRect(hx - 16, hy - 2, 2, 5);
+        ctx.fillRect(hx - 12, hy - 3, 2, 5);
+
+        // Tail — sweeping back, at gallop angle
+        ctx.fillStyle = '#1a0a05';
+        ctx.save();
+        ctx.translate(hx + 26, hy + 3);
+        ctx.rotate(Math.PI / 9);
+        ctx.fillRect(0, -2, 14, 4);
+        ctx.fillRect(8, -1, 8, 7);
+        ctx.fillRect(12, 0, 5, 9);
         ctx.restore();
+
+        // Legs — gallop pose: front-left forward, front-right back, rears mid-stride
+        ctx.fillStyle = '#3a2210';
+        // Front-left (extended forward)
+        ctx.fillRect(hx - 18, hy + 12, 3, 11);
+        ctx.fillRect(hx - 19, hy + 22, 5, 2); // hoof
+        // Front-right (tucked back)
+        ctx.save();
+        ctx.translate(hx - 12, hy + 12);
+        ctx.rotate(0.45);
+        ctx.fillRect(-1, 0, 3, 10);
+        ctx.fillRect(-2, 9, 5, 2);
+        ctx.restore();
+        // Rear-right (planted)
+        ctx.fillRect(hx + 16, hy + 12, 3, 11);
+        ctx.fillRect(hx + 15, hy + 22, 5, 2);
+        // Rear-left (mid-kick)
+        ctx.save();
+        ctx.translate(hx + 22, hy + 12);
+        ctx.rotate(-0.35);
+        ctx.fillRect(-1, 0, 3, 10);
+        ctx.fillRect(-2, 9, 5, 2);
+        ctx.restore();
+
+        // Saddle — leather with red blanket trim
+        ctx.fillStyle = '#a83030';
+        ctx.fillRect(hx - 8, hy - 3, 18, 5);
+        ctx.fillStyle = '#3a1a0a';
+        ctx.fillRect(hx - 6, hy - 5, 14, 3);
+        // Stirrup
+        ctx.strokeStyle = '#888';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(hx + 6, hy + 0);
+        ctx.lineTo(hx + 8, hy + 9);
+        ctx.stroke();
+
+        // Lance — couched, leveled forward
+        ctx.save();
+        ctx.translate(handX + 2, handY + 10);
+        ctx.rotate(-Math.PI / 12);
+        // shaft
+        ctx.fillStyle = '#8a5a2a';
+        ctx.fillRect(-2, -36, 3, 36);
+        // grip wrap
+        ctx.fillStyle = '#3a2a1a';
+        ctx.fillRect(-3, -8, 5, 5);
+        // pennant
+        ctx.fillStyle = '#cc2222';
+        ctx.beginPath();
+        ctx.moveTo(-1, -28);
+        ctx.lineTo(7, -26);
+        ctx.lineTo(2, -22);
+        ctx.lineTo(7, -18);
+        ctx.lineTo(-1, -16);
+        ctx.closePath();
+        ctx.fill();
+        // spear tip
+        ctx.fillStyle = '#dddddd';
+        ctx.beginPath();
+        ctx.moveTo(0, -42);
+        ctx.lineTo(-3, -34);
+        ctx.lineTo(3, -34);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#888';
+        ctx.fillRect(-1, -36, 2, 3);
+        ctx.restore();
+
+        // Dust kick at hooves
+        ctx.fillStyle = 'rgba(180,150,100,0.45)';
+        ctx.beginPath();
+        ctx.ellipse(hx - 18, hy + 25, 5, 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(hx + 18, hy + 25, 5, 2, 0, 0, Math.PI * 2);
+        ctx.fill();
         break;
       }
       case 'hammer': {
