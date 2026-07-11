@@ -416,6 +416,10 @@ export class StageScene extends Phaser.Scene {
   private handleP1Input(): void {
     if (!this.player.isAlive) return;
 
+    // Deferred short combos (e.g. →→ dash after hold, if →→J was not finished)
+    const deferred = this.comboParser.tick();
+    if (deferred) this.player.executeCombo(deferred);
+
     let dx = 0, dy = 0;
     if (this.keyW?.isDown) dy = -1;
     if (this.keyS?.isDown) dy = 1;
@@ -463,6 +467,9 @@ export class StageScene extends Phaser.Scene {
   // --- P2 Input (Arrows + ,/M/./ / ) ---
   private handleP2Input(): void {
     if (!this.player2 || !this.player2.isAlive) return;
+
+    const deferred = this.comboParser2.tick();
+    if (deferred) this.player2.executeCombo(deferred);
 
     let dx = 0, dy = 0;
     if (this.cursors.up.isDown) dy = -1;

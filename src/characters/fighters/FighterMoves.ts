@@ -42,89 +42,100 @@ export interface FighterMoveSet {
   specialFrames: Record<string, number>;
 }
 
-// ---------- Project Shaolong ----------
+// Shared lightweight stance buff for non-Ying fighters (↓↓L)
+const STANCE_FOCUS: MoveHitbox = {
+  offsetX: 0, offsetY: 0, width: 1, height: 1,
+  damage: 0, knockbackX: 0, knockbackY: 0, hitstun: 0, mpCost: 15,
+  selfBuff: { atkMul: 1.25, duration: 4000 },
+};
+
+// ---------- Project Shaolong — balanced, clean cancel windows ----------
 const XiangShaoLongMoves: FighterMoveSet = {
-  L1: { offsetX: 22, offsetY: -28, width: 34, height: 28, damage: 12, knockbackX: 180, knockbackY: 20, hitstun: 250, mpCost: 0, activeStart: 0.25, activeEnd: 0.6 },
-  L2: { offsetX: 24, offsetY: -28, width: 38, height: 28, damage: 15, knockbackX: 220, knockbackY: 20, hitstun: 280, mpCost: 0, activeStart: 0.25, activeEnd: 0.6 },
-  L3: { offsetX: 28, offsetY: -30, width: 46, height: 34, damage: 22, knockbackX: 320, knockbackY: 40, hitstun: 380, mpCost: 0, activeStart: 0.3, activeEnd: 0.65 },
-  heavy: { offsetX: 20, offsetY: -28, width: 36, height: 30, damage: 28, knockbackX: 260, knockbackY: 30, hitstun: 420, mpCost: 0, activeStart: 0.35, activeEnd: 0.7 },
+  L1: { offsetX: 22, offsetY: -28, width: 36, height: 28, damage: 12, knockbackX: 160, knockbackY: 15, hitstun: 220, mpCost: 0, activeStart: 0.22, activeEnd: 0.55 },
+  L2: { offsetX: 26, offsetY: -28, width: 40, height: 28, damage: 16, knockbackX: 200, knockbackY: 18, hitstun: 260, mpCost: 0, activeStart: 0.20, activeEnd: 0.58 },
+  L3: { offsetX: 30, offsetY: -30, width: 48, height: 34, damage: 24, knockbackX: 340, knockbackY: 45, hitstun: 400, mpCost: 0, activeStart: 0.28, activeEnd: 0.68 },
+  heavy: { offsetX: 22, offsetY: -28, width: 40, height: 32, damage: 30, knockbackX: 280, knockbackY: 35, hitstun: 440, mpCost: 0, activeStart: 0.32, activeEnd: 0.72 },
   specials: {
-    flying_knee: { offsetX: 28, offsetY: -30, width: 50, height: 36, damage: 25, knockbackX: 380, knockbackY: 50, hitstun: 400, mpCost: 15, activeStart: 0.2, activeEnd: 0.8, travel: { distance: 120, duration: 260 } },
-    uppercut: { offsetX: 18, offsetY: -48, width: 38, height: 54, damage: 30, knockbackX: 100, knockbackY: -220, hitstun: 450, mpCost: 25, activeStart: 0.2, activeEnd: 0.6 },
-    sweep_stomp: { offsetX: 24, offsetY: -18, width: 56, height: 24, damage: 35, knockbackX: 450, knockbackY: 30, hitstun: 500, mpCost: 30, activeStart: 0.3, activeEnd: 0.8 },
-    super: { offsetX: 26, offsetY: -30, width: 60, height: 40, damage: 10, knockbackX: 550, knockbackY: 60, hitstun: 700, mpCost: 60, activeStart: 0.1, activeEnd: 0.95, multiHit: { hits: 7, interval: 90 } },
+    flying_knee: { offsetX: 30, offsetY: -30, width: 52, height: 36, damage: 28, knockbackX: 400, knockbackY: 55, hitstun: 420, mpCost: 15, activeStart: 0.18, activeEnd: 0.78, travel: { distance: 130, duration: 240 } },
+    uppercut: { offsetX: 18, offsetY: -50, width: 40, height: 56, damage: 32, knockbackX: 80, knockbackY: -240, hitstun: 480, mpCost: 22, activeStart: 0.18, activeEnd: 0.62 },
+    sweep_stomp: { offsetX: 26, offsetY: -16, width: 60, height: 24, damage: 36, knockbackX: 480, knockbackY: 25, hitstun: 520, mpCost: 28, activeStart: 0.28, activeEnd: 0.78 },
+    super: { offsetX: 28, offsetY: -30, width: 64, height: 42, damage: 12, knockbackX: 120, knockbackY: 30, hitstun: 120, mpCost: 60, activeStart: 0.08, activeEnd: 0.96, multiHit: { hits: 7, interval: 85 } },
+    stance_focus: STANCE_FOCUS,
   },
-  lightFrames: 360,
-  heavyFrames: 520,
-  specialFrames: { flying_knee: 500, uppercut: 560, sweep_stomp: 620, super: 900 },
+  lightFrames: 340,
+  heavyFrames: 500,
+  specialFrames: { flying_knee: 480, uppercut: 540, sweep_stomp: 600, super: 880, stance_focus: 200 },
 };
 
-// ---------- Lian Jin ----------
+// ---------- Lian Jin — fast rushdown, sharp cancels ----------
 const LianJinMoves: FighterMoveSet = {
-  L1: { offsetX: 26, offsetY: -28, width: 42, height: 26, damage: 15, knockbackX: 200, knockbackY: 20, hitstun: 280, mpCost: 0, activeStart: 0.25, activeEnd: 0.55 },
-  L2: { offsetX: 28, offsetY: -30, width: 46, height: 26, damage: 18, knockbackX: 240, knockbackY: 20, hitstun: 300, mpCost: 0, activeStart: 0.25, activeEnd: 0.55 },
-  L3: { offsetX: 32, offsetY: -28, width: 54, height: 26, damage: 22, knockbackX: 420, knockbackY: 30, hitstun: 380, mpCost: 0, activeStart: 0.3, activeEnd: 0.6 },
-  heavy: { offsetX: 24, offsetY: -34, width: 48, height: 44, damage: 30, knockbackX: 200, knockbackY: -80, hitstun: 450, mpCost: 0, activeStart: 0.35, activeEnd: 0.7 },
+  L1: { offsetX: 28, offsetY: -28, width: 44, height: 26, damage: 14, knockbackX: 170, knockbackY: 15, hitstun: 200, mpCost: 0, activeStart: 0.18, activeEnd: 0.50 },
+  L2: { offsetX: 30, offsetY: -30, width: 48, height: 26, damage: 18, knockbackX: 210, knockbackY: 18, hitstun: 240, mpCost: 0, activeStart: 0.16, activeEnd: 0.52 },
+  L3: { offsetX: 34, offsetY: -28, width: 56, height: 28, damage: 24, knockbackX: 440, knockbackY: 35, hitstun: 380, mpCost: 0, activeStart: 0.22, activeEnd: 0.58 },
+  heavy: { offsetX: 26, offsetY: -36, width: 50, height: 46, damage: 32, knockbackX: 180, knockbackY: -100, hitstun: 460, mpCost: 0, activeStart: 0.30, activeEnd: 0.68 },
   specials: {
-    phantom_step: { offsetX: 28, offsetY: -30, width: 52, height: 36, damage: 32, knockbackX: 500, knockbackY: 30, hitstun: 430, mpCost: 20, activeStart: 0.2, activeEnd: 0.7, travel: { distance: 150, duration: 180 } },
-    sword_wave: { offsetX: 30, offsetY: -28, width: 32, height: 32, damage: 25, knockbackX: 350, knockbackY: 20, hitstun: 380, mpCost: 30, activeStart: 0.1, activeEnd: 0.9, projectile: { speed: 420, range: 300 } },
-    counter: { offsetX: 24, offsetY: -30, width: 50, height: 34, damage: 40, knockbackX: 480, knockbackY: 60, hitstun: 500, mpCost: 15, activeStart: 0.15, activeEnd: 0.5 },
-    super: { offsetX: 28, offsetY: -30, width: 58, height: 40, damage: 10, knockbackX: 600, knockbackY: 40, hitstun: 700, mpCost: 60, activeStart: 0.1, activeEnd: 0.95, multiHit: { hits: 10, interval: 70 } },
-  },
-  lightFrames: 320,
-  heavyFrames: 540,
-  specialFrames: { phantom_step: 420, sword_wave: 560, counter: 420, super: 900 },
-};
-
-// ---------- Wu Ting Fang ----------
-const WuTingFangMoves: FighterMoveSet = {
-  L1: { offsetX: 18, offsetY: -28, width: 30, height: 24, damage: 10, knockbackX: 160, knockbackY: 20, hitstun: 220, mpCost: 0, activeStart: 0.2, activeEnd: 0.55 },
-  L2: { offsetX: 20, offsetY: -28, width: 32, height: 26, damage: 12, knockbackX: 180, knockbackY: 20, hitstun: 250, mpCost: 0, activeStart: 0.2, activeEnd: 0.55 },
-  L3: { offsetX: 24, offsetY: -30, width: 42, height: 34, damage: 18, knockbackX: 280, knockbackY: 30, hitstun: 320, mpCost: 0, activeStart: 0.25, activeEnd: 0.65 },
-  heavy: { offsetX: 22, offsetY: -30, width: 44, height: 36, damage: 22, knockbackX: 300, knockbackY: 30, hitstun: 360, mpCost: 0, activeStart: 0.3, activeEnd: 0.65 },
-  specials: {
-    air_dive: { offsetX: 20, offsetY: -20, width: 32, height: 40, damage: 20, knockbackX: 200, knockbackY: 100, hitstun: 350, mpCost: 0, activeStart: 0.1, activeEnd: 0.9 },
-    pounce: { offsetX: 24, offsetY: -30, width: 44, height: 36, damage: 25, knockbackX: 360, knockbackY: 30, hitstun: 380, mpCost: 15, activeStart: 0.25, activeEnd: 0.75, travel: { distance: 140, duration: 260 } },
-    whirl: { offsetX: 0, offsetY: -28, width: 72, height: 40, damage: 5, knockbackX: 260, knockbackY: 20, hitstun: 300, mpCost: 25, activeStart: 0.1, activeEnd: 0.95, multiHit: { hits: 6, interval: 80 } },
-    super: { offsetX: 0, offsetY: -46, width: 72, height: 72, damage: 8, knockbackX: 100, knockbackY: -280, hitstun: 600, mpCost: 60, activeStart: 0.1, activeEnd: 0.95, multiHit: { hits: 7, interval: 80 } },
+    phantom_step: { offsetX: 30, offsetY: -30, width: 54, height: 36, damage: 34, knockbackX: 520, knockbackY: 30, hitstun: 440, mpCost: 18, activeStart: 0.15, activeEnd: 0.72, travel: { distance: 160, duration: 160 } },
+    sword_wave: { offsetX: 32, offsetY: -28, width: 34, height: 32, damage: 26, knockbackX: 360, knockbackY: 20, hitstun: 360, mpCost: 28, activeStart: 0.08, activeEnd: 0.92, projectile: { speed: 460, range: 320 } },
+    counter: { offsetX: 26, offsetY: -30, width: 52, height: 36, damage: 42, knockbackX: 500, knockbackY: 70, hitstun: 520, mpCost: 12, activeStart: 0.10, activeEnd: 0.48 },
+    super: { offsetX: 30, offsetY: -30, width: 60, height: 40, damage: 11, knockbackX: 100, knockbackY: 25, hitstun: 100, mpCost: 60, activeStart: 0.06, activeEnd: 0.96, multiHit: { hits: 10, interval: 65 } },
+    stance_focus: STANCE_FOCUS,
   },
   lightFrames: 280,
-  heavyFrames: 400,
-  specialFrames: { air_dive: 360, pounce: 480, whirl: 560, super: 820 },
+  heavyFrames: 480,
+  specialFrames: { phantom_step: 400, sword_wave: 520, counter: 380, super: 860, stance_focus: 200 },
 };
 
-// ---------- Shan Rou ----------
-const ShanRouMoves: FighterMoveSet = {
-  L1: { offsetX: 18, offsetY: -28, width: 28, height: 24, damage: 12, knockbackX: 160, knockbackY: 15, hitstun: 180, mpCost: 0, activeStart: 0.2, activeEnd: 0.5 },
-  L2: { offsetX: 20, offsetY: -28, width: 30, height: 24, damage: 12, knockbackX: 160, knockbackY: 15, hitstun: 180, mpCost: 0, activeStart: 0.2, activeEnd: 0.5 },
-  L3: { offsetX: 22, offsetY: -30, width: 36, height: 28, damage: 16, knockbackX: 220, knockbackY: 20, hitstun: 260, mpCost: 0, activeStart: 0.25, activeEnd: 0.55 },
-  heavy: { offsetX: 22, offsetY: -30, width: 40, height: 32, damage: 20, knockbackX: 260, knockbackY: 20, hitstun: 340, mpCost: 0, activeStart: 0.25, activeEnd: 0.6 },
+// ---------- Wu Ting Fang — agile aerial ----------
+const WuTingFangMoves: FighterMoveSet = {
+  L1: { offsetX: 18, offsetY: -28, width: 32, height: 24, damage: 10, knockbackX: 140, knockbackY: 15, hitstun: 180, mpCost: 0, activeStart: 0.16, activeEnd: 0.48 },
+  L2: { offsetX: 20, offsetY: -28, width: 34, height: 26, damage: 12, knockbackX: 160, knockbackY: 18, hitstun: 200, mpCost: 0, activeStart: 0.16, activeEnd: 0.50 },
+  L3: { offsetX: 24, offsetY: -32, width: 44, height: 36, damage: 20, knockbackX: 300, knockbackY: 40, hitstun: 340, mpCost: 0, activeStart: 0.20, activeEnd: 0.62 },
+  heavy: { offsetX: 22, offsetY: -30, width: 46, height: 36, damage: 24, knockbackX: 320, knockbackY: 35, hitstun: 380, mpCost: 0, activeStart: 0.26, activeEnd: 0.64 },
   specials: {
-    backstab: { offsetX: -22, offsetY: -28, width: 38, height: 30, damage: 35, knockbackX: 200, knockbackY: 40, hitstun: 420, mpCost: 20, activeStart: 0.4, activeEnd: 0.75, teleportBehind: true },
-    dagger_throw: { offsetX: 20, offsetY: -28, width: 18, height: 14, damage: 10, knockbackX: 140, knockbackY: 10, hitstun: 200, mpCost: 15, activeStart: 0.15, activeEnd: 0.95, multiHit: { hits: 3, interval: 110 }, projectile: { speed: 480, range: 280 } },
-    bleed_combo: { offsetX: 24, offsetY: -28, width: 40, height: 30, damage: 4, knockbackX: 200, knockbackY: 20, hitstun: 280, mpCost: 25, activeStart: 0.1, activeEnd: 0.95, multiHit: { hits: 8, interval: 70 } },
-    super: { offsetX: 0, offsetY: -28, width: 80, height: 48, damage: 9, knockbackX: 450, knockbackY: 30, hitstun: 700, mpCost: 60, activeStart: 0.05, activeEnd: 0.95, multiHit: { hits: 8, interval: 75 } },
+    air_dive: { offsetX: 16, offsetY: -12, width: 36, height: 44, damage: 22, knockbackX: 220, knockbackY: 120, hitstun: 360, mpCost: 0, activeStart: 0.08, activeEnd: 0.92 },
+    pounce: { offsetX: 26, offsetY: -30, width: 46, height: 36, damage: 26, knockbackX: 380, knockbackY: 35, hitstun: 400, mpCost: 14, activeStart: 0.20, activeEnd: 0.78, travel: { distance: 150, duration: 240 } },
+    whirl: { offsetX: 0, offsetY: -28, width: 76, height: 42, damage: 6, knockbackX: 200, knockbackY: 15, hitstun: 80, mpCost: 24, activeStart: 0.08, activeEnd: 0.96, multiHit: { hits: 6, interval: 75 } },
+    super: { offsetX: 0, offsetY: -48, width: 76, height: 76, damage: 9, knockbackX: 80, knockbackY: -300, hitstun: 100, mpCost: 60, activeStart: 0.08, activeEnd: 0.96, multiHit: { hits: 7, interval: 75 } },
+    stance_focus: STANCE_FOCUS,
   },
-  lightFrames: 240,
+  lightFrames: 260,
   heavyFrames: 380,
-  specialFrames: { backstab: 500, dagger_throw: 460, bleed_combo: 640, super: 820 },
+  specialFrames: { air_dive: 340, pounce: 460, whirl: 540, super: 800, stance_focus: 200 },
 };
 
-// ---------- Ying Zheng ----------
-const YingZhengMoves: FighterMoveSet = {
-  L1: { offsetX: 22, offsetY: -30, width: 40, height: 32, damage: 18, knockbackX: 220, knockbackY: 20, hitstun: 320, mpCost: 0, activeStart: 0.35, activeEnd: 0.65 },
-  L2: { offsetX: 24, offsetY: -30, width: 42, height: 32, damage: 22, knockbackX: 260, knockbackY: 20, hitstun: 350, mpCost: 0, activeStart: 0.35, activeEnd: 0.65 },
-  L3: { offsetX: 28, offsetY: -34, width: 52, height: 38, damage: 30, knockbackX: 400, knockbackY: 60, hitstun: 480, mpCost: 0, activeStart: 0.4, activeEnd: 0.75 },
-  heavy: { offsetX: 0, offsetY: -14, width: 100, height: 22, damage: 40, knockbackX: 280, knockbackY: 40, hitstun: 550, mpCost: 0, activeStart: 0.45, activeEnd: 0.8 },
+// ---------- Shan Rou — assassin, fast chain, teleport ----------
+const ShanRouMoves: FighterMoveSet = {
+  L1: { offsetX: 18, offsetY: -28, width: 30, height: 24, damage: 11, knockbackX: 130, knockbackY: 10, hitstun: 150, mpCost: 0, activeStart: 0.14, activeEnd: 0.45 },
+  L2: { offsetX: 20, offsetY: -28, width: 32, height: 24, damage: 12, knockbackX: 140, knockbackY: 12, hitstun: 160, mpCost: 0, activeStart: 0.14, activeEnd: 0.46 },
+  L3: { offsetX: 24, offsetY: -30, width: 38, height: 28, damage: 18, knockbackX: 240, knockbackY: 22, hitstun: 280, mpCost: 0, activeStart: 0.18, activeEnd: 0.55 },
+  heavy: { offsetX: 22, offsetY: -30, width: 42, height: 32, damage: 22, knockbackX: 280, knockbackY: 22, hitstun: 340, mpCost: 0, activeStart: 0.22, activeEnd: 0.58 },
   specials: {
-    king_charge: { offsetX: 28, offsetY: -32, width: 50, height: 42, damage: 35, knockbackX: 500, knockbackY: 40, hitstun: 500, mpCost: 20, activeStart: 0.15, activeEnd: 0.9, travel: { distance: 160, duration: 320 }, superArmor: true },
-    imperial_palm: { offsetX: 36, offsetY: -30, width: 80, height: 42, damage: 40, knockbackX: 550, knockbackY: 60, hitstun: 550, mpCost: 30, activeStart: 0.3, activeEnd: 0.85 },
-    decree: { offsetX: 0, offsetY: -30, width: 1, height: 1, damage: 0, knockbackX: 0, knockbackY: 0, hitstun: 0, mpCost: 30, selfBuff: { atkMul: 1.5, duration: 5000 } },
-    super: { offsetX: 0, offsetY: -30, width: 800, height: 200, damage: 90, knockbackX: 600, knockbackY: 60, hitstun: 900, mpCost: 70, activeStart: 0.35, activeEnd: 0.75, fullscreen: true },
+    backstab: { offsetX: 20, offsetY: -28, width: 40, height: 32, damage: 38, knockbackX: 220, knockbackY: 45, hitstun: 440, mpCost: 20, activeStart: 0.35, activeEnd: 0.72, teleportBehind: true },
+    dagger_throw: { offsetX: 22, offsetY: -28, width: 18, height: 14, damage: 11, knockbackX: 140, knockbackY: 10, hitstun: 80, mpCost: 14, activeStart: 0.12, activeEnd: 0.95, multiHit: { hits: 3, interval: 100 }, projectile: { speed: 500, range: 300 } },
+    bleed_combo: { offsetX: 24, offsetY: -28, width: 42, height: 30, damage: 5, knockbackX: 120, knockbackY: 12, hitstun: 70, mpCost: 24, activeStart: 0.08, activeEnd: 0.96, multiHit: { hits: 8, interval: 65 } },
+    super: { offsetX: 0, offsetY: -28, width: 84, height: 50, damage: 10, knockbackX: 160, knockbackY: 20, hitstun: 90, mpCost: 60, activeStart: 0.04, activeEnd: 0.96, multiHit: { hits: 8, interval: 70 } },
+    stance_focus: STANCE_FOCUS,
   },
-  lightFrames: 440,
-  heavyFrames: 620,
-  specialFrames: { king_charge: 540, imperial_palm: 620, decree: 500, super: 1000 },
+  lightFrames: 220,
+  heavyFrames: 360,
+  specialFrames: { backstab: 480, dagger_throw: 440, bleed_combo: 600, super: 800, stance_focus: 200 },
+};
+
+// ---------- Ying Zheng — tank, slow but crushing ----------
+const YingZhengMoves: FighterMoveSet = {
+  L1: { offsetX: 24, offsetY: -30, width: 42, height: 34, damage: 18, knockbackX: 200, knockbackY: 20, hitstun: 300, mpCost: 0, activeStart: 0.30, activeEnd: 0.62 },
+  L2: { offsetX: 26, offsetY: -30, width: 44, height: 34, damage: 22, knockbackX: 240, knockbackY: 22, hitstun: 340, mpCost: 0, activeStart: 0.28, activeEnd: 0.64 },
+  L3: { offsetX: 30, offsetY: -34, width: 54, height: 40, damage: 32, knockbackX: 420, knockbackY: 70, hitstun: 500, mpCost: 0, activeStart: 0.34, activeEnd: 0.76 },
+  heavy: { offsetX: 0, offsetY: -14, width: 108, height: 24, damage: 42, knockbackX: 300, knockbackY: 45, hitstun: 560, mpCost: 0, activeStart: 0.40, activeEnd: 0.82 },
+  specials: {
+    king_charge: { offsetX: 30, offsetY: -32, width: 54, height: 44, damage: 38, knockbackX: 520, knockbackY: 45, hitstun: 520, mpCost: 20, activeStart: 0.12, activeEnd: 0.90, travel: { distance: 170, duration: 300 }, superArmor: true },
+    imperial_palm: { offsetX: 38, offsetY: -30, width: 84, height: 44, damage: 42, knockbackX: 580, knockbackY: 65, hitstun: 560, mpCost: 28, activeStart: 0.28, activeEnd: 0.82 },
+    decree: { offsetX: 0, offsetY: -30, width: 1, height: 1, damage: 0, knockbackX: 0, knockbackY: 0, hitstun: 0, mpCost: 30, selfBuff: { atkMul: 1.5, duration: 5000 } },
+    super: { offsetX: 0, offsetY: -30, width: 800, height: 200, damage: 95, knockbackX: 620, knockbackY: 70, hitstun: 900, mpCost: 70, activeStart: 0.32, activeEnd: 0.78, fullscreen: true },
+  },
+  lightFrames: 420,
+  heavyFrames: 600,
+  specialFrames: { king_charge: 520, imperial_palm: 600, decree: 400, super: 1000 },
 };
 
 export const FIGHTER_MOVES: Record<FighterNameType, FighterMoveSet> = {

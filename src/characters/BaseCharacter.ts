@@ -407,28 +407,22 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
         this.scene.cameras.main.shake(200, 0.012);
         this.scene.cameras.main.flash(180, 255, 240, 180);
         this.fxChargeRing(color, 20, 80, 500);
-
-        // Dynamic camera zoom on super moves
+        this.fxChargeRing(color, 30, 100, 600);
         this.scene.cameras.main.zoomTo(1.3, 200, 'Sine.easeOut', true);
         this.scene.time.delayedCall(800, () => {
           this.scene.cameras.main.zoomTo(1, 400, 'Sine.easeInOut', true);
         });
         break;
+      case 'stance_focus':
+      case 'decree':
+        this.fxImperialAura();
+        this.fxChargeRing(0xffdd44, 16, 56, 400);
+        break;
       default:
         break;
     }
 
-    if (moveName === 'super') {
-      this.scene.cameras.main.shake(150, 0.01);
-      this.scene.cameras.main.flash(200, 255, 200, 100);
-      this.fxChargeRing(color, 30, 100, 600);
-      
-      // Dynamic camera zoom on super moves
-      this.scene.cameras.main.zoomTo(1.3, 200, 'Sine.easeOut', true);
-      this.scene.time.delayedCall(800, () => {
-        this.scene.cameras.main.zoomTo(1, 400, 'Sine.easeInOut', true);
-      });
-    } else if (kind === 'special' && moveName !== 'super') {
+    if (kind === 'special' && moveName !== 'super' && moveName !== 'stance_focus' && moveName !== 'decree') {
       this.scene.cameras.main.shake(80, 0.004);
       this.scene.cameras.main.flash(90, 255, 200, 255);
     }
@@ -451,15 +445,24 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
     }
   }
 
+  /**
+   * Begin an attack. Use `cancel: true` to chain/cancel out of an existing Attack
+   * (light chain L1→L2→L3, special cancel from lights, etc.).
+   */
   startAttack(attackName: string, totalFrames: number, options?: {
     activeStart?: number;
     activeEnd?: number;
     superArmor?: boolean;
     travel?: { distance: number; duration: number };
     teleportBehind?: boolean;
+    /** Allow replacing the current Attack state (chain / special cancel) */
+    cancel?: boolean;
   }): boolean {
     const state = this.stateMachine.currentState;
-    if (state === CharacterState.Attack || state === CharacterState.Hurt || state === CharacterState.Dead) return false;
+    if (state === CharacterState.Hurt || state === CharacterState.Dead || state === CharacterState.Dash) {
+      return false;
+    }
+    if (state === CharacterState.Attack && !options?.cancel) return false;
 
     this.currentAttackName = attackName;
     this.attackFrame = 0;
@@ -467,6 +470,7 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
     this.attackActiveStart = options?.activeStart ?? 0.25;
     this.attackActiveEnd = options?.activeEnd ?? 0.65;
     this.superArmorActive = !!options?.superArmor;
+    this.isHitboxActive = false;
 
     if (options?.travel) {
       this.travelDistance = options.travel.distance;
@@ -476,17 +480,32 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
     } else {
       this.travelDistance = 0;
       this.travelDuration = 0;
+      this.travelElapsed = 0;
     }
 
     if (options?.teleportBehind) {
-      // This is triggered by PlayerCharacter with target reference;
-      // effect is a blink tween here. Position change happens in subclass.
-      this.setAlpha(0.4);
-      this.scene.time.delayedCall(120, () => { if (this.active) this.setAlpha(1); });
+      // Blink; actual reposition is done by PlayerCharacter when a target is nearby.
+      this.setAlpha(0.35);
+      this.scene.time.delayedCall(100, () => { if (this.active) this.setAlpha(1); });
     }
 
-    this.stateMachine.transition(CharacterState.Attack);
+    if (state === CharacterState.Attack && options?.cancel) {
+      // Already in Attack — reset timers without re-entering state machine
+      this.stateMachine.forceTransition(CharacterState.Attack);
+    } else {
+      this.stateMachine.transition(CharacterState.Attack);
+    }
     return true;
+  }
+
+  /** True while the current light/heavy is deep enough into its frames for special cancel. */
+  canSpecialCancel(minFrac: number = 0.5): boolean {
+    if (this.stateMachine.currentState !== CharacterState.Attack) return true;
+    if (!this.attackTotalFrames) return false;
+    const name = this.currentAttackName;
+    // Only cancel from lights/heavy — not from other specials/supers
+    if (name !== 'L1' && name !== 'L2' && name !== 'L3' && name !== 'heavy') return false;
+    return this.attackFrame / this.attackTotalFrames >= minFrac;
   }
 
   performDash(direction: 1 | -1): void {
@@ -578,7 +597,8 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
       }
 
       if (this.dashElapsed >= this.dashDuration) {
-        this.stateMachine.transition(CharacterState.Idle);
+        // Dash may not be in Idle's whitelist on every subclass — force out cleanly
+        this.stateMachine.forceTransition(CharacterState.Idle);
       }
     }
 

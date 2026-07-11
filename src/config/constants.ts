@@ -12,11 +12,16 @@ export const PLAYER_JUMP_HEIGHT = 80;
 export const PLAYER_JUMP_DURATION = 500;
 
 // Combat
-export const COMBO_INPUT_WINDOW = 300; // ms
+export const COMBO_INPUT_WINDOW = 420; // ms — slightly forgiving for special routes
+export const COMBO_PREFIX_HOLD_MS = 120; // wait before firing short combos that prefix longer ones (→→ vs →→J)
+export const LIGHT_CHAIN_CANCEL = 0.45; // fraction of attack when next light can chain
+export const SPECIAL_CANCEL_WINDOW = 0.50; // fraction of light/heavy when specials can cancel
+export const COUNTER_WINDOW_MS = 280; // ms after releasing block for counter
+export const LIGHT_CHAIN_WINDOW_MS = 480; // ms after light hit to continue chain from idle
 export const HIT_STUN_BASE = 400; // ms
 export const KNOCKBACK_FRICTION = 0.9;
 export const BLOCK_DAMAGE_REDUCTION = 0.8;
-export const MAX_ACTIVE_ENEMIES = 6;
+export const MAX_ACTIVE_ENEMIES = 14;
 
 // AI
 export const ENEMY_DECISION_INTERVAL = 500; // ms

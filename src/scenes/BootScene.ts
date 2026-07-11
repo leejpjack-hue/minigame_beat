@@ -59,7 +59,7 @@ export class BootScene extends Phaser.Scene {
       }
     }
 
-    // Enemy sprites (rollout 3: full roster)
+    // Enemy sprites — grunts + 《尋秦記》 named minibosses
     const enemyTypes: { key: string; w: number; h: number; main: string; accent: string; weapon: any; hair: any }[] = [
       { key: 'sprite_enemy_soldier',   w: 32, h: 46, main: '#777777', accent: '#3a2a1a', weapon: 'sword',  hair: 'helmet' },
       { key: 'sprite_enemy_archer',    w: 30, h: 44, main: '#8a6a3a', accent: '#3a2a1a', weapon: 'bow',    hair: 'helmet' },
@@ -67,9 +67,21 @@ export class BootScene extends Phaser.Scene {
       { key: 'sprite_enemy_shieldman', w: 36, h: 48, main: '#aa7733', accent: '#553311', weapon: 'shield_axe', hair: 'helmet' },
       { key: 'sprite_enemy_cavalry',   w: 72, h: 64, main: '#553322', accent: '#331a0a', weapon: 'cavalry', hair: 'helmet' },
       { key: 'sprite_enemy_elite',     w: 34, h: 48, main: '#cc9944', accent: '#332211', weapon: 'sword',  hair: 'helmet' },
+      { key: 'sprite_enemy_assassin',  w: 30, h: 44, main: '#2a2a3a', accent: '#8844aa', weapon: 'dagger', hair: 'short' },
+      { key: 'sprite_enemy_zhaoguard', w: 34, h: 48, main: '#8b1a1a', accent: '#d4a017', weapon: 'sword',  hair: 'helmet' },
+      { key: 'sprite_enemy_qinguard',  w: 36, h: 50, main: '#1a1a2e', accent: '#c9a227', weapon: 'sword',  hair: 'helmet' },
       { key: 'sprite_enemy_general',   w: 42, h: 56, main: '#aa2222', accent: '#1a1a1a', weapon: 'sword',  hair: 'topknot' },
       { key: 'sprite_enemy_minilj',    w: 36, h: 50, main: '#2a1a2a', accent: '#cc2222', weapon: 'sword',  hair: 'topknot' },
       { key: 'sprite_enemy_minitx',    w: 38, h: 54, main: '#bb4444', accent: '#222222', weapon: 'spear',  hair: 'topknot' },
+      { key: 'sprite_enemy_zhaomu',    w: 38, h: 52, main: '#6b1a1a', accent: '#e8c547', weapon: 'sword',  hair: 'crown' },
+      { key: 'sprite_enemy_guokai',    w: 36, h: 50, main: '#4a3a2a', accent: '#88aa44', weapon: 'dagger', hair: 'topknot' },
+      { key: 'sprite_enemy_limu',      w: 40, h: 56, main: '#8b0000', accent: '#f0e68c', weapon: 'spear',  hair: 'topknot' },
+      { key: 'sprite_enemy_lubuwei',   w: 42, h: 56, main: '#2c1810', accent: '#c9a227', weapon: 'royalblade', hair: 'crown' },
+      { key: 'sprite_enemy_chengjiao', w: 38, h: 52, main: '#1a3a5c', accent: '#ffd700', weapon: 'sword',  hair: 'topknot' },
+      { key: 'sprite_enemy_jingke',    w: 34, h: 50, main: '#1a1a28', accent: '#aa66ff', weapon: 'dagger', hair: 'short' },
+      { key: 'sprite_enemy_fanyuqi',   w: 42, h: 56, main: '#3d5a3d', accent: '#c0c0c0', weapon: 'sword',  hair: 'topknot' },
+      { key: 'sprite_enemy_yandan',    w: 38, h: 54, main: '#1e3a5f', accent: '#88ccee', weapon: 'sword',  hair: 'crown' },
+      { key: 'sprite_enemy_wangjian',  w: 44, h: 58, main: '#1a1a1a', accent: '#ff4444', weapon: 'sword',  hair: 'helmet' },
       { key: 'sprite_boss_lao',        w: 46, h: 60, main: '#882288', accent: '#ffcc44', weapon: 'hammer', hair: 'crown' },
     ];
     for (const e of enemyTypes) {

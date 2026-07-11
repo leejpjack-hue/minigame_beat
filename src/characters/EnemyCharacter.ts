@@ -31,7 +31,7 @@ export class EnemyCharacter extends BaseCharacter {
       onEnter: () => this.stateLabel.setColor('#ffff00'),
     });
     this.stateMachine.addState(CharacterState.Walk, {
-      canTransitionFrom: [CharacterState.Idle, CharacterState.Attack],
+      canTransitionFrom: [CharacterState.Idle, CharacterState.Attack, CharacterState.Block],
       onEnter: () => this.stateLabel.setColor('#88ff88'),
     });
     this.stateMachine.addState(CharacterState.Jump, {
@@ -83,6 +83,10 @@ export class EnemyCharacter extends BaseCharacter {
   moveToward(targetX: number, targetY: number): void {
     const state = this.stateMachine.currentState;
     if (state === CharacterState.Attack || state === CharacterState.Hurt || state === CharacterState.Dead) return;
+    // Don't stay locked in guard while trying to walk
+    if (state === CharacterState.Block) {
+      this.stateMachine.forceTransition(CharacterState.Idle);
+    }
     const dx = targetX - this.x;
     const dy = targetY - this.groundY;
     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -97,11 +101,15 @@ export class EnemyCharacter extends BaseCharacter {
   performAttack(): void {
     const state = this.stateMachine.currentState;
     if (state === CharacterState.Attack || state === CharacterState.Hurt || state === CharacterState.Dead) return;
+    // Drop block immediately when committing to an attack
+    if (state === CharacterState.Block) {
+      this.stateMachine.forceTransition(CharacterState.Idle);
+    }
     const attackName = this.typeDef?.attackName ?? 'enemy_attack';
     const hb = ENEMY_HITBOXES[attackName];
     if (!hb) { this.startAttack(attackName, 400); return; }
-    const total = this.aiType === 'boss' || this.aiType === 'miniboss_lj' || this.aiType === 'miniboss_tx' ? 600 : 450;
-    this.startAttack(attackName, total, { activeStart: 0.35, activeEnd: 0.65 });
+    const total = this.aiType === 'boss' || this.aiType === 'miniboss_lj' || this.aiType === 'miniboss_tx' ? 560 : 400;
+    this.startAttack(attackName, total, { activeStart: 0.30, activeEnd: 0.68 });
 
     // Fire projectile mid-animation if archer-like
     if (this.typeDef?.hasProjectile && this.onProjectile) {

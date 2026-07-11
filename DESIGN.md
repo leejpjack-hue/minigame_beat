@@ -126,10 +126,11 @@ Special move flags:
 
 ### 4. Combo Parser (`ComboParser.ts`)
 
-Sliding-window input buffer (300ms):
+Sliding-window input buffer (420ms) with deferred prefix matching (120ms):
 - Records `ComboInput` tokens with timestamps
-- Matches sequences longest-first to prevent short matches shadowing long ones
-- 8 defined combos: Super (D→↓→J / D→→↓J), Buff (↓↓S), Low Special (↓→K / ↓K), Up Special (↑K), Dash Attack (→→J / ←←J)
+- Matches sequences longest-first + priority; short routes that prefix longer ones (→→ vs →→J) wait `COMBO_PREFIX_HOLD_MS` before firing
+- Special routes: Super (↓→J / →↓→J / ↓↑J), Buff (↓↓L), Low Special (↓→K / ↓K), Up Special (↑K), Forward Special (→K), Dash Attack (→→J), Dash (→→ deferred), Counter (L→K), Light Finisher (JJK), Heavy Burst (KK)
+- Light chain cancel at 45% of frames; special cancel from late lights/heavy
 
 ### 5. AI Controller (`AIController.ts`)
 

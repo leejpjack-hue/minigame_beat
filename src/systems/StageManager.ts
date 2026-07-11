@@ -29,7 +29,7 @@ export interface StageConfig {
   waves: WaveConfig[];
 }
 
-// ---------- Stage 1 ----------
+// ---------- Stage 1: 咸陽城街道 — street brawl, grow the pack ----------
 const STAGE_1: StageConfig = {
   name: 'Xianyang Streets',
   nameZH: '咸陽城街道',
@@ -37,44 +37,49 @@ const STAGE_1: StageConfig = {
   groundColor: 0x3a2a1a,
   accentColor: 0x554433,
   waves: [
-    // 1: tutorial pair
     { enemies: [
-      { x: 600, groundY: 330, type: 'soldier' },
-      { x: 660, groundY: 350, type: 'soldier' },
+      { x: 560, groundY: 320, type: 'soldier' },
+      { x: 620, groundY: 340, type: 'soldier' },
+      { x: 680, groundY: 360, type: 'soldier' },
+      { x: 720, groundY: 330, type: 'soldier' },
     ]},
-    // 2: trio with ranged
-    { enemies: [
-      { x: 540, groundY: 320, type: 'soldier' },
-      { x: 600, groundY: 340, type: 'soldier' },
-      { x: 700, groundY: 360, type: 'archer' },
-    ]},
-    // 3: spearman threat
     { enemies: [
       { x: 500, groundY: 320, type: 'soldier' },
-      { x: 560, groundY: 350, type: 'spearman' },
-      { x: 640, groundY: 330, type: 'soldier' },
-      { x: 700, groundY: 360, type: 'archer' },
+      { x: 560, groundY: 350, type: 'soldier' },
+      { x: 620, groundY: 330, type: 'spearman' },
+      { x: 680, groundY: 360, type: 'archer' },
+      { x: 740, groundY: 320, type: 'archer' },
     ]},
-    // 4: shield + crossfire
     { enemies: [
-      { x: 480, groundY: 310, type: 'shieldman' },
+      { x: 480, groundY: 310, type: 'soldier' },
       { x: 540, groundY: 340, type: 'soldier' },
-      { x: 620, groundY: 360, type: 'spearman' },
-      { x: 700, groundY: 320, type: 'archer' },
+      { x: 600, groundY: 360, type: 'spearman' },
+      { x: 660, groundY: 320, type: 'shieldman' },
+      { x: 700, groundY: 350, type: 'archer' },
+      { x: 740, groundY: 330, type: 'assassin' },
+    ]},
+    { enemies: [
+      { x: 460, groundY: 320, type: 'shieldman' },
+      { x: 520, groundY: 350, type: 'soldier' },
+      { x: 580, groundY: 320, type: 'spearman' },
+      { x: 640, groundY: 360, type: 'soldier' },
+      { x: 700, groundY: 330, type: 'archer' },
       { x: 740, groundY: 360, type: 'archer' },
+      { x: 680, groundY: 310, type: 'assassin' },
     ]},
-    // 5: stage-1 mini-finale (elite anchors a squad)
+    // Mini-boss: street captain (將軍) + squad
     { enemies: [
-      { x: 480, groundY: 320, type: 'soldier' },
-      { x: 540, groundY: 340, type: 'soldier' },
-      { x: 600, groundY: 360, type: 'shieldman' },
+      { x: 500, groundY: 340, type: 'boss' },
+      { x: 580, groundY: 320, type: 'soldier' },
+      { x: 620, groundY: 360, type: 'soldier' },
       { x: 660, groundY: 330, type: 'spearman' },
-      { x: 720, groundY: 350, type: 'elite' },
+      { x: 700, groundY: 350, type: 'elite' },
+      { x: 740, groundY: 320, type: 'archer' },
     ]},
   ],
 };
 
-// ---------- Stage 2 ----------
+// ---------- Stage 2: 趙國質子府 — Zhao court intrigue ----------
 const STAGE_2: StageConfig = {
   name: 'Zhao Palace',
   nameZH: '趙國質子府',
@@ -82,45 +87,52 @@ const STAGE_2: StageConfig = {
   groundColor: 0x2a1a2a,
   accentColor: 0x443344,
   waves: [
-    // 1
     { enemies: [
-      { x: 500, groundY: 330, type: 'soldier' },
-      { x: 560, groundY: 350, type: 'spearman' },
-      { x: 620, groundY: 320, type: 'archer' },
-    ]},
-    // 2
-    { enemies: [
-      { x: 480, groundY: 310, type: 'spearman' },
-      { x: 540, groundY: 340, type: 'soldier' },
-      { x: 600, groundY: 360, type: 'shieldman' },
-      { x: 680, groundY: 330, type: 'archer' },
-    ]},
-    // 3 — courtyard ambush
-    { enemies: [
-      { x: 480, groundY: 320, type: 'shieldman' },
-      { x: 540, groundY: 350, type: 'spearman' },
-      { x: 600, groundY: 320, type: 'soldier' },
-      { x: 660, groundY: 360, type: 'soldier' },
+      { x: 500, groundY: 320, type: 'zhao_guard' },
+      { x: 560, groundY: 350, type: 'zhao_guard' },
+      { x: 620, groundY: 330, type: 'spearman' },
+      { x: 680, groundY: 360, type: 'archer' },
       { x: 720, groundY: 320, type: 'archer' },
     ]},
-    // 4 — elite + cavalry pressure
     { enemies: [
-      { x: 460, groundY: 320, type: 'cavalry' },
-      { x: 560, groundY: 350, type: 'shieldman' },
-      { x: 620, groundY: 320, type: 'elite' },
-      { x: 700, groundY: 360, type: 'archer' },
+      { x: 480, groundY: 310, type: 'zhao_guard' },
+      { x: 540, groundY: 340, type: 'shieldman' },
+      { x: 600, groundY: 360, type: 'spearman' },
+      { x: 660, groundY: 320, type: 'soldier' },
+      { x: 700, groundY: 350, type: 'assassin' },
+      { x: 740, groundY: 330, type: 'archer' },
     ]},
-    // 5 — miniboss 連晉 + escort
+    // 郭開 — corrupt minister + tricksters
     { enemies: [
-      { x: 500, groundY: 340, type: 'miniboss_lj' },
-      { x: 600, groundY: 320, type: 'soldier' },
-      { x: 600, groundY: 360, type: 'soldier' },
-      { x: 700, groundY: 340, type: 'archer' },
+      { x: 520, groundY: 340, type: 'miniboss_gk' },
+      { x: 480, groundY: 310, type: 'assassin' },
+      { x: 600, groundY: 360, type: 'assassin' },
+      { x: 660, groundY: 320, type: 'zhao_guard' },
+      { x: 700, groundY: 350, type: 'archer' },
+      { x: 740, groundY: 330, type: 'archer' },
+    ]},
+    // 趙穆 — Marquis of Zhao
+    { enemies: [
+      { x: 520, groundY: 340, type: 'miniboss_zm' },
+      { x: 460, groundY: 320, type: 'zhao_guard' },
+      { x: 560, groundY: 360, type: 'zhao_guard' },
+      { x: 620, groundY: 310, type: 'elite' },
+      { x: 680, groundY: 350, type: 'shieldman' },
+      { x: 720, groundY: 330, type: 'archer' },
+    ]},
+    // 管中邪 + 圖先 escort
+    { enemies: [
+      { x: 480, groundY: 330, type: 'miniboss_lj' },
+      { x: 640, groundY: 350, type: 'miniboss_tx' },
+      { x: 540, groundY: 310, type: 'zhao_guard' },
+      { x: 580, groundY: 360, type: 'zhao_guard' },
+      { x: 700, groundY: 320, type: 'archer' },
+      { x: 740, groundY: 360, type: 'assassin' },
     ]},
   ],
 };
 
-// ---------- Stage 3 ----------
+// ---------- Stage 3: 秦長城邊境 — border war, Li Mu ----------
 const STAGE_3: StageConfig = {
   name: 'Qin Border Wall',
   nameZH: '秦長城邊境',
@@ -128,44 +140,54 @@ const STAGE_3: StageConfig = {
   groundColor: 0x2a2a2a,
   accentColor: 0x444444,
   waves: [
-    // 1 — sentry post
     { enemies: [
-      { x: 600, groundY: 330, type: 'soldier' },
-      { x: 650, groundY: 340, type: 'spearman' },
-      { x: 720, groundY: 350, type: 'archer' },
-    ]},
-    // 2 — cavalry charge
-    { enemies: [
-      { x: 480, groundY: 310, type: 'cavalry' },
-      { x: 720, groundY: 360, type: 'cavalry' },
-      { x: 600, groundY: 340, type: 'shieldman' },
-    ]},
-    // 3 — defensive line
-    { enemies: [
-      { x: 500, groundY: 320, type: 'shieldman' },
+      { x: 500, groundY: 320, type: 'soldier' },
       { x: 560, groundY: 350, type: 'spearman' },
-      { x: 620, groundY: 320, type: 'spearman' },
-      { x: 680, groundY: 360, type: 'archer' },
-      { x: 740, groundY: 330, type: 'archer' },
-    ]},
-    // 4 — heavy cavalry + elite
-    { enemies: [
-      { x: 460, groundY: 320, type: 'elite' },
-      { x: 540, groundY: 350, type: 'cavalry' },
-      { x: 640, groundY: 320, type: 'cavalry' },
-      { x: 720, groundY: 360, type: 'elite' },
-    ]},
-    // 5 — miniboss 圖先 + ranged support
-    { enemies: [
-      { x: 500, groundY: 340, type: 'miniboss_tx' },
-      { x: 620, groundY: 320, type: 'spearman' },
+      { x: 620, groundY: 330, type: 'spearman' },
       { x: 680, groundY: 360, type: 'archer' },
       { x: 720, groundY: 320, type: 'archer' },
+      { x: 740, groundY: 350, type: 'cavalry' },
+    ]},
+    { enemies: [
+      { x: 460, groundY: 310, type: 'cavalry' },
+      { x: 540, groundY: 360, type: 'cavalry' },
+      { x: 620, groundY: 330, type: 'cavalry' },
+      { x: 680, groundY: 320, type: 'shieldman' },
+      { x: 720, groundY: 350, type: 'elite' },
+      { x: 740, groundY: 310, type: 'archer' },
+    ]},
+    // 成蟜 — rebel prince leads mutiny
+    { enemies: [
+      { x: 520, groundY: 340, type: 'miniboss_cj' },
+      { x: 460, groundY: 310, type: 'cavalry' },
+      { x: 580, groundY: 360, type: 'elite' },
+      { x: 640, groundY: 320, type: 'spearman' },
+      { x: 700, groundY: 350, type: 'archer' },
+      { x: 740, groundY: 330, type: 'assassin' },
+    ]},
+    { enemies: [
+      { x: 480, groundY: 320, type: 'shieldman' },
+      { x: 540, groundY: 350, type: 'elite' },
+      { x: 600, groundY: 310, type: 'cavalry' },
+      { x: 660, groundY: 360, type: 'cavalry' },
+      { x: 700, groundY: 330, type: 'spearman' },
+      { x: 740, groundY: 350, type: 'archer' },
+      { x: 620, groundY: 340, type: 'assassin' },
+    ]},
+    // 李牧 — Zhao war god
+    { enemies: [
+      { x: 500, groundY: 340, type: 'miniboss_lm' },
+      { x: 460, groundY: 310, type: 'cavalry' },
+      { x: 560, groundY: 360, type: 'cavalry' },
+      { x: 620, groundY: 320, type: 'elite' },
+      { x: 680, groundY: 350, type: 'spearman' },
+      { x: 720, groundY: 330, type: 'archer' },
+      { x: 740, groundY: 360, type: 'archer' },
     ]},
   ],
 };
 
-// ---------- Stage 4 ----------
+// ---------- Stage 4: 秦王大殿前殿 — court power struggle ----------
 const STAGE_4: StageConfig = {
   name: 'Qin Throne Room Approach',
   nameZH: '秦王大殿前殿',
@@ -173,43 +195,55 @@ const STAGE_4: StageConfig = {
   groundColor: 0x3a1a0a,
   accentColor: 0x664422,
   waves: [
-    // 1 — elite welcome
     { enemies: [
-      { x: 480, groundY: 330, type: 'elite' },
-      { x: 560, groundY: 350, type: 'elite' },
-      { x: 640, groundY: 320, type: 'shieldman' },
+      { x: 480, groundY: 320, type: 'qin_guard' },
+      { x: 540, groundY: 350, type: 'qin_guard' },
+      { x: 600, groundY: 330, type: 'qin_guard' },
+      { x: 660, groundY: 360, type: 'elite' },
+      { x: 720, groundY: 320, type: 'archer' },
+      { x: 740, groundY: 350, type: 'shieldman' },
     ]},
-    // 2 — palace guard
+    // 呂不韋 — Chancellor
     { enemies: [
-      { x: 460, groundY: 320, type: 'shieldman' },
-      { x: 540, groundY: 350, type: 'elite' },
-      { x: 620, groundY: 320, type: 'spearman' },
-      { x: 700, groundY: 360, type: 'archer' },
-      { x: 740, groundY: 320, type: 'archer' },
+      { x: 520, groundY: 340, type: 'miniboss_lbw' },
+      { x: 460, groundY: 310, type: 'qin_guard' },
+      { x: 580, groundY: 360, type: 'qin_guard' },
+      { x: 640, groundY: 320, type: 'elite' },
+      { x: 700, groundY: 350, type: 'shieldman' },
+      { x: 740, groundY: 330, type: 'archer' },
     ]},
-    // 3 — cavalry + elite squad
+    // 荊軻 — assassin attempt
     { enemies: [
-      { x: 460, groundY: 320, type: 'cavalry' },
-      { x: 540, groundY: 350, type: 'elite' },
+      { x: 540, groundY: 340, type: 'miniboss_jk' },
+      { x: 480, groundY: 310, type: 'assassin' },
+      { x: 560, groundY: 360, type: 'assassin' },
+      { x: 620, groundY: 320, type: 'assassin' },
+      { x: 680, groundY: 350, type: 'qin_guard' },
+      { x: 720, groundY: 330, type: 'elite' },
+    ]},
+    // 樊於期 + 燕丹
+    { enemies: [
+      { x: 460, groundY: 320, type: 'miniboss_fyq' },
+      { x: 640, groundY: 350, type: 'miniboss_yd' },
+      { x: 520, groundY: 310, type: 'elite' },
+      { x: 580, groundY: 360, type: 'cavalry' },
+      { x: 700, groundY: 330, type: 'archer' },
+      { x: 740, groundY: 360, type: 'assassin' },
+    ]},
+    // 王翦 holds the gate
+    { enemies: [
+      { x: 500, groundY: 340, type: 'miniboss_wj' },
+      { x: 460, groundY: 310, type: 'qin_guard' },
+      { x: 560, groundY: 360, type: 'qin_guard' },
       { x: 620, groundY: 320, type: 'elite' },
-      { x: 700, groundY: 360, type: 'shieldman' },
-    ]},
-    // 4 — both minibosses converge
-    { enemies: [
-      { x: 460, groundY: 320, type: 'miniboss_lj' },
-      { x: 660, groundY: 360, type: 'miniboss_tx' },
-      { x: 600, groundY: 340, type: 'archer' },
-    ]},
-    // 5 — pre-boss general
-    { enemies: [
-      { x: 500, groundY: 340, type: 'boss' },
-      { x: 620, groundY: 320, type: 'shieldman' },
-      { x: 700, groundY: 360, type: 'elite' },
+      { x: 680, groundY: 350, type: 'cavalry' },
+      { x: 720, groundY: 330, type: 'shieldman' },
+      { x: 740, groundY: 360, type: 'archer' },
     ]},
   ],
 };
 
-// ---------- Stage 5 (final) ----------
+// ---------- Stage 5: 秦王大殿 — final gauntlet + 嫪毐 ----------
 const STAGE_5: StageConfig = {
   name: 'Qin Throne Room',
   nameZH: '秦王大殿',
@@ -217,37 +251,46 @@ const STAGE_5: StageConfig = {
   groundColor: 0x4a1a0a,
   accentColor: 0xffaa44,
   waves: [
-    // 1 — royal honor guard
     { enemies: [
-      { x: 480, groundY: 330, type: 'elite' },
-      { x: 560, groundY: 350, type: 'elite' },
-      { x: 640, groundY: 320, type: 'shieldman' },
-      { x: 720, groundY: 360, type: 'spearman' },
+      { x: 460, groundY: 320, type: 'qin_guard' },
+      { x: 520, groundY: 350, type: 'qin_guard' },
+      { x: 580, groundY: 310, type: 'elite' },
+      { x: 640, groundY: 360, type: 'elite' },
+      { x: 700, groundY: 330, type: 'shieldman' },
+      { x: 740, groundY: 350, type: 'spearman' },
     ]},
-    // 2 — cavalry storm the throne
     { enemies: [
-      { x: 460, groundY: 320, type: 'cavalry' },
-      { x: 560, groundY: 360, type: 'cavalry' },
-      { x: 660, groundY: 320, type: 'cavalry' },
-      { x: 740, groundY: 350, type: 'elite' },
+      { x: 460, groundY: 310, type: 'cavalry' },
+      { x: 540, groundY: 360, type: 'cavalry' },
+      { x: 620, groundY: 320, type: 'cavalry' },
+      { x: 680, groundY: 350, type: 'qin_guard' },
+      { x: 720, groundY: 330, type: 'elite' },
+      { x: 740, groundY: 360, type: 'assassin' },
     ]},
-    // 3 — twin generals
-    { enemies: [
-      { x: 460, groundY: 320, type: 'boss' },
-      { x: 700, groundY: 360, type: 'boss' },
-      { x: 580, groundY: 340, type: 'shieldman' },
-      { x: 640, groundY: 320, type: 'archer' },
-    ]},
-    // 4 — both minibosses + cavalry escort (last gauntlet)
+    // Rematch gauntlet: 管中邪 + 荊軻 + 成蟜
     { enemies: [
       { x: 460, groundY: 320, type: 'miniboss_lj' },
-      { x: 700, groundY: 360, type: 'miniboss_tx' },
-      { x: 540, groundY: 340, type: 'cavalry' },
-      { x: 640, groundY: 340, type: 'cavalry' },
+      { x: 580, groundY: 340, type: 'miniboss_jk' },
+      { x: 700, groundY: 360, type: 'miniboss_cj' },
+      { x: 520, groundY: 310, type: 'assassin' },
+      { x: 640, groundY: 350, type: 'qin_guard' },
+      { x: 740, groundY: 320, type: 'archer' },
     ]},
-    // 5 — final boss 嫪毐
+    // 呂不韋 + 王翦 dual small-boss
+    { enemies: [
+      { x: 460, groundY: 320, type: 'miniboss_lbw' },
+      { x: 680, groundY: 360, type: 'miniboss_wj' },
+      { x: 540, groundY: 340, type: 'qin_guard' },
+      { x: 600, groundY: 310, type: 'elite' },
+      { x: 640, groundY: 360, type: 'cavalry' },
+      { x: 720, groundY: 330, type: 'archer' },
+    ]},
+    // Final boss 嫪毐
     { enemies: [
       { x: 500, groundY: 340, type: 'boss_lao' },
+      { x: 600, groundY: 320, type: 'qin_guard' },
+      { x: 660, groundY: 360, type: 'qin_guard' },
+      { x: 720, groundY: 340, type: 'elite' },
     ]},
   ],
 };
@@ -310,18 +353,15 @@ export class StageManager {
     return this.enemies.filter((e) => e.isAlive);
   }
 
-  /** World width spanning all sections of this stage. */
   get stageWidth(): number {
     return this.config.waves.length * this.sectionWidth;
   }
 
-  /** Right-edge gate for current wave; player cannot cross while wave is active. */
   get sectionGateX(): number {
     const section = Math.max(0, this.currentWave - 1);
     return (section + 1) * this.sectionWidth - 20;
   }
 
-  /** True while current wave is still active (enemies alive) — players are locked to current section. */
   get isLocked(): boolean {
     return !this.waveCleared && !this.stageComplete && this.currentWave > 0;
   }
@@ -334,17 +374,16 @@ export class StageManager {
         enemy.update(time, delta);
       } else if (!this.deadEnemies.has(enemy)) {
         this.deadEnemies.add(enemy);
-        
-        // Score System: points per kill, scaled by combo
+
         const combo = this.combatSystem.getHitCounter();
-        const basePoints = 100;
-        const comboMultiplier = 1 + (combo * 0.1); // +10% per hit in combo
+        const isNamed = enemy.typeDef?.id?.startsWith('miniboss') || enemy.typeDef?.id === 'boss' || enemy.typeDef?.id === 'boss_lao';
+        const basePoints = isNamed ? 500 : 100;
+        const comboMultiplier = 1 + (combo * 0.1);
         const points = Math.floor(basePoints * comboMultiplier);
         let currentScore = this.scene.registry.get('score') || 0;
         this.scene.registry.set('score', currentScore + points);
 
-        // 25% chance to drop an item
-        if (Math.random() < 0.25) {
+        if (Math.random() < (isNamed ? 0.6 : 0.25)) {
           const type = Math.random() < 0.5 ? 'hp' : 'mp';
           this.itemDrops.spawnItem(enemy.x, enemy.groundY, type);
         }
@@ -352,7 +391,6 @@ export class StageManager {
     }
     for (const ai of this.aiControllers) ai.update(time, delta);
 
-    // Clamp alive enemies to current section so knockback can't fling them off-stage
     if (this.currentWave > 0) {
       const sectionLeft = (this.currentWave - 1) * this.sectionWidth;
       const sectionRight = this.currentWave * this.sectionWidth - 10;
@@ -365,7 +403,6 @@ export class StageManager {
 
     if (this.stageComplete || this.currentWave <= 0) return;
 
-    // Wave just cleared
     if (!this.waveCleared && this.aliveEnemies.length === 0) {
       this.waveCleared = true;
       if (this.currentWave >= this.config.waves.length) {
@@ -376,7 +413,6 @@ export class StageManager {
       }
     }
 
-    // Any alive player walked far enough into the next section → spawn next wave
     if (this.waveCleared && this.currentWave < this.config.waves.length) {
       const triggerX = this.currentWave * this.sectionWidth + 80;
       const crossed = this.players.some((p) => p.isAlive && p.x >= triggerX);
@@ -395,24 +431,27 @@ export class StageManager {
     const baseX = waveIndex * this.sectionWidth;
 
     this.scene.sound.play('ui_wave_start');
-    this.waveText.setText(`Wave ${this.currentWave}/${this.config.waves.length}`);
+
+    // Banner: show named miniboss if present
+    const named = wave.enemies.find((e) => e.type.startsWith('miniboss') || e.type === 'boss_lao' || e.type === 'boss');
+    const namedLabel = named ? ` — ${ENEMY_TYPES[named.type].nameZH}` : '';
+    this.waveText.setText(`Wave ${this.currentWave}/${this.config.waves.length}${namedLabel}`);
     this.waveText.setAlpha(1);
-    this.scene.tweens.add({ targets: this.waveText, alpha: 0, duration: 2000, delay: 1000 });
+    this.scene.tweens.add({ targets: this.waveText, alpha: 0, duration: 2200, delay: 1200 });
 
     for (const enemyDef of wave.enemies) {
       const typeDef = ENEMY_TYPES[enemyDef.type];
-      
-      // Difficulty Scaling: Increase stats based on stage index
+
       const stageIndex = ALL_STAGES.indexOf(this.config);
-      const diffMul = 1 + Math.max(0, stageIndex) * 0.2; // +20% stats per stage
-      
+      const diffMul = 1 + Math.max(0, stageIndex) * 0.2;
+
       const baseStats = { ...typeDef.stats, ...enemyDef.stats };
       const stats = {
         ...baseStats,
         maxHp: Math.floor((baseStats.maxHp ?? 100) * diffMul),
         attackPower: Math.floor((baseStats.attackPower ?? 10) * diffMul),
       };
-      
+
       const worldX = baseX + enemyDef.x;
       let enemy: EnemyCharacter;
       if (enemyDef.type === 'boss_lao') {
@@ -423,8 +462,21 @@ export class StageManager {
         enemy = new EnemyCharacter(this.scene, worldX, enemyDef.groundY, stats, typeDef);
       }
 
+      // Name tag for minibosses / bosses
+      if (typeDef.id.startsWith('miniboss') || typeDef.id === 'boss' || typeDef.id === 'boss_lao') {
+        const h = typeDef.stats.height ?? 52;
+        const tag = this.scene.add.text(0, -h - 18, typeDef.nameZH, {
+          fontSize: '11px', fontFamily: 'monospace', color: '#ffaa88',
+          stroke: '#000', strokeThickness: 2,
+        }).setOrigin(0.5);
+        enemy.add(tag);
+      }
+
       enemy.onProjectile = (att) => {
-        const atk = ENEMY_HITBOXES[att.typeDef?.attackName ?? 'enemy_arrow'];
+        const atkName = att.typeDef?.attackName ?? 'enemy_arrow';
+        // Guo Kai uses poison projectile override
+        const key = att.enemyTypeId === 'miniboss_gk' ? 'enemy_poison' : atkName;
+        const atk = ENEMY_HITBOXES[key] ?? ENEMY_HITBOXES[atkName];
         if (!atk?.projectile) return;
         const dir = att.facing === Direction.Right ? 1 : -1;
         this.projectiles.spawn({
@@ -439,7 +491,7 @@ export class StageManager {
           knockbackY: atk.knockbackY,
           width: atk.width,
           height: atk.height,
-          color: 0xffcc55,
+          color: att.enemyTypeId === 'miniboss_gk' ? 0x88ff44 : 0xffcc55,
           targetIsPlayer: true,
         });
       };
@@ -455,15 +507,15 @@ export class StageManager {
     }
   }
 
+  /** Visual only — StageScene advances to next stage / Victory. */
   private showStageComplete(): void {
-    const cam = this.scene.cameras.main;
-    const text = this.scene.add.text(cam.scrollX + GAME_WIDTH / 2, GAME_HEIGHT / 2, 'STAGE CLEAR!', {
+    const text = this.scene.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'STAGE CLEAR!', {
       fontSize: '40px', fontFamily: 'monospace', color: '#ffdd00', stroke: '#000', strokeThickness: 5,
     }).setOrigin(0.5).setDepth(2000).setScrollFactor(0);
 
     this.scene.tweens.add({
       targets: text, scale: 1.2, duration: 500, yoyo: true, repeat: 3,
-      onComplete: () => { this.scene.scene.start('Victory'); },
+      onComplete: () => text.destroy(),
     });
   }
 
@@ -481,7 +533,7 @@ export class StageManager {
 
   nearestAlivePlayer(fromX: number, fromY: number): BaseCharacter {
     const alive = this.players.filter((p) => p.isAlive);
-    if (alive.length === 0) return this.players[0]; // fallback
+    if (alive.length === 0) return this.players[0];
     if (alive.length === 1) return alive[0];
     let best = alive[0];
     let bestDist = Infinity;
@@ -492,9 +544,9 @@ export class StageManager {
     return best;
   }
 
-  destroy(): void { 
-    this.waveText?.destroy(); 
-    this.advancePrompt?.destroy(); 
+  destroy(): void {
+    this.waveText?.destroy();
+    this.advancePrompt?.destroy();
     this.itemDrops.clear();
   }
 }
