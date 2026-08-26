@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { BaseCharacter } from './BaseCharacter';
 import { CharacterState } from '../enums/CharacterState';
 import { FighterStats } from './fighters/FighterStats';
+import { fitCharacterArt } from '../utils/CharacterArt';
 
 export class BreakableObject extends BaseCharacter {
   constructor(scene: Phaser.Scene, x: number, y: number, key: string, maxHp: number = 1) {
@@ -25,6 +26,9 @@ export class BreakableObject extends BaseCharacter {
     
     // Customize rendering: breakables don't use pose-based texture switching like fighters
     this.bodySprite.setTexture(key);
+    if (key.startsWith('art_')) {
+      fitCharacterArt(this.bodySprite, key === 'art_lantern' ? 46 : 42);
+    }
     this.stateLabel.setVisible(false);
   }
 

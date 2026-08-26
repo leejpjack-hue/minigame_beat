@@ -11,6 +11,9 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   width: GAME_WIDTH,
   height: GAME_HEIGHT,
+  pixelArt: true,
+  antialias: false,
+  roundPixels: true,
   parent: undefined,
   physics: {
     default: 'arcade',

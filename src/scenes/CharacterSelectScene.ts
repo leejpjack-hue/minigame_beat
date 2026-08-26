@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { fitCharacterArt } from '../utils/CharacterArt';
 import { SceneKeys } from '../enums/SceneKeys';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config/constants';
 import { ALL_FIGHTERS } from '../characters/fighters';
@@ -26,6 +27,9 @@ export class CharacterSelectScene extends Phaser.Scene {
   create(): void {
     this.p1Confirmed = false;
     this.p2Confirmed = false;
+    // Scene instances survive Back/re-entry, but their display objects do not.
+    this.cards = [];
+    this.previewTexts = [];
     this.cameras.main.setBackgroundColor('#0a0a2e');
 
     // Title
@@ -89,7 +93,7 @@ export class CharacterSelectScene extends Phaser.Scene {
     this.createStatPreview();
 
     // Confirm button
-    this.confirmButton = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 35, '', {
+    this.confirmButton = this.add.text(580, 350, '', {
       fontSize: '14px', fontFamily: 'monospace', color: '#ffffff',
     }).setOrigin(0.5);
 
@@ -277,8 +281,11 @@ export class CharacterSelectScene extends Phaser.Scene {
     bg.setStrokeStyle(2, 0x444466);
     container.add(bg);
 
-    const sprite = this.add.image(0, -20, fighter.spriteKey);
-    sprite.setScale(2);
+    const sprite = this.add.image(0, 22, fighter.spriteKey);
+    const previewHeight = fighter.fighterKey === 'ying_zheng' ? 90 : 84;
+    if (!fitCharacterArt(sprite, previewHeight)) {
+      sprite.setOrigin(0.5, 1).setScale(1.5);
+    }
     container.add(sprite);
 
     const name = this.add.text(0, 35, fighter.nameZH, {

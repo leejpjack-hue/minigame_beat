@@ -5,6 +5,7 @@ import { StateMachine } from '../systems/StateMachine';
 import { FighterStats } from './fighters/FighterStats';
 import { clamp } from '../utils/MathHelpers';
 import { STAGE_WALKABLE_Y_MIN, STAGE_WALKABLE_Y_MAX, KNOCKBACK_FRICTION } from '../config/constants';
+import { fitCharacterArt } from '../utils/CharacterArt';
 
 export abstract class BaseCharacter extends Phaser.GameObjects.Container {
   // Stats
@@ -109,14 +110,20 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
 
     this.bodySprite = this.scene.add.image(0, 0, this.stats.spriteKey);
     this.bodySprite.setOrigin(0.5, 1);
+    const hasDetailedArt = fitCharacterArt(this.bodySprite, Math.round(this.stats.height * 1.65));
     this.add(this.bodySprite);
 
-    this.stateLabel = this.scene.add.text(0, -this.stats.height - 10, 'idle', {
+    const labelY = hasDetailedArt ? -Math.round(this.stats.height * 1.65) - 8 : -this.stats.height - 10;
+    this.stateLabel = this.scene.add.text(0, labelY, 'idle', {
       fontSize: '10px',
       color: '#ffff00',
       fontFamily: 'monospace',
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setVisible(false);
     this.add(this.stateLabel);
+  }
+
+  setDebugLabelVisible(visible: boolean): void {
+    this.stateLabel.setVisible(visible && this.stats.fighterKey !== 'breakable');
   }
 
   protected abstract defineStates(): void;
@@ -592,7 +599,9 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
       if (Math.random() > 0.4) {
         const ghost = this.scene.add.image(this.x, this.y, this.bodySprite.texture.key);
         ghost.setFlipX(this.facing === Direction.Left);
-        ghost.setOrigin(0.5, 1).setDepth(this.groundY - 1).setAlpha(0.5).setTint(0x88ccff);
+        ghost.setOrigin(this.bodySprite.originX, this.bodySprite.originY)
+          .setScale(this.bodySprite.scaleX, this.bodySprite.scaleY)
+          .setDepth(this.groundY - 1).setAlpha(0.5).setTint(0x88ccff);
         this.scene.tweens.add({ targets: ghost, alpha: 0, duration: 250, onComplete: () => ghost.destroy() });
       }
 
@@ -637,7 +646,9 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
       if (Math.random() > 0.6) {
         const ghost = this.scene.add.image(this.x, this.y, this.bodySprite.texture.key);
         ghost.setFlipX(this.facing === Direction.Left);
-        ghost.setOrigin(0.5, 1).setDepth(this.groundY - 1).setAlpha(0.3).setTint(0xffaaaa);
+        ghost.setOrigin(this.bodySprite.originX, this.bodySprite.originY)
+          .setScale(this.bodySprite.scaleX, this.bodySprite.scaleY)
+          .setDepth(this.groundY - 1).setAlpha(0.3).setTint(0xffaaaa);
         this.scene.tweens.add({ targets: ghost, alpha: 0, duration: 250, onComplete: () => ghost.destroy() });
       }
 
@@ -709,6 +720,7 @@ export abstract class BaseCharacter extends Phaser.GameObjects.Container {
     if (this.currentPoseKey === desired) return;
     if (this.scene.textures.exists(desired)) {
       this.bodySprite.setTexture(desired);
+      fitCharacterArt(this.bodySprite, Math.round(this.stats.height * 1.65));
       this.currentPoseKey = desired;
     }
   }

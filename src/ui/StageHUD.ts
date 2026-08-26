@@ -25,14 +25,15 @@ export class StageHUD {
   }
 
   initPlayerHUD(char: BaseCharacter, tag: string = 'P1'): void {
-    const yOff = tag === 'P2' ? 62 : 20;
-    const labelY = tag === 'P2' ? 47 : 5;
+    const yOff = 36;
+    const labelY = 5;
+    const xOff = tag === 'P2' ? 260 : 20;
     const tagColor = tag === 'P2' ? '#44ddff' : '#ffffff';
 
     if (tag === 'P1') {
-      this.playerHpBar = new HealthBar(this.scene, 20, yOff, 200, 14, char.maxHp);
-      this.playerMpBar = new MPBar(this.scene, 20, yOff + 22, 160, 10, char.maxMp);
-      this.playerLabel = this.scene.add.text(20, labelY, `[P1] ${char.stats.nameZH}`, {
+      this.playerHpBar = new HealthBar(this.scene, xOff, yOff, 200, 14, char.maxHp);
+      this.playerMpBar = new MPBar(this.scene, xOff, yOff + 26, 160, 10, char.maxMp);
+      this.playerLabel = this.scene.add.text(xOff, labelY, `[P1] ${char.stats.nameZH}`, {
         fontSize: '12px', color: tagColor, fontFamily: 'monospace',
         stroke: '#000', strokeThickness: 2,
       }).setDepth(900).setScrollFactor(0);
@@ -42,9 +43,9 @@ export class StageHUD {
         stroke: '#000', strokeThickness: 3,
       }).setOrigin(1, 0).setDepth(900).setScrollFactor(0);
     } else {
-      this.player2HpBar = new HealthBar(this.scene, 20, yOff, 200, 14, char.maxHp);
-      this.player2MpBar = new MPBar(this.scene, 20, yOff + 22, 160, 10, char.maxMp);
-      this.player2Label = this.scene.add.text(20, labelY, `[P2] ${char.stats.nameZH}`, {
+      this.player2HpBar = new HealthBar(this.scene, xOff, yOff, 200, 14, char.maxHp);
+      this.player2MpBar = new MPBar(this.scene, xOff, yOff + 26, 160, 10, char.maxMp);
+      this.player2Label = this.scene.add.text(xOff, labelY, `[P2] ${char.stats.nameZH}`, {
         fontSize: '12px', color: tagColor, fontFamily: 'monospace',
         stroke: '#000', strokeThickness: 2,
       }).setDepth(900).setScrollFactor(0);

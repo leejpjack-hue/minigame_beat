@@ -15,6 +15,8 @@ import { StageManager, ALL_STAGES } from '../systems/StageManager';
 import { FighterStats } from '../characters/fighters/FighterStats';
 import { XiangShaoLongStats } from '../characters/fighters/XiangShaoLong';
 import { BreakableObject } from '../characters/BreakableObject';
+import { backgroundKey, getRoundArt } from '../config/RoundArt';
+import { RoundBackdrop } from '../utils/RoundBackdrop';
 
 export class StageScene extends Phaser.Scene {
   private player!: PlayerCharacter;
@@ -95,6 +97,25 @@ export class StageScene extends Phaser.Scene {
 
     // Full stage width spans all sections (one per wave)
     const stageWidth = stageConfig.waves.length * GAME_WIDTH;
+
+    const hasRoundArt = this.textures.exists(backgroundKey(getRoundArt(this.currentStageIndex, 0).scene));
+    if (hasRoundArt) {
+      new RoundBackdrop(this, this.currentStageIndex);
+      this.breakables = [];
+      for (let section = 0; section < stageConfig.waves.length; section++) {
+        const base = section * GAME_WIDTH;
+        // Real breakables stay in the world, independent of illustrated scenery.
+        if (this.textures.exists('art_crate')) {
+          this.breakables.push(new BreakableObject(this, base + 65, 286, 'art_crate', 30));
+          this.breakables.push(new BreakableObject(this, base + 740, 292, 'art_crate', 30));
+        }
+        if (this.textures.exists('art_lantern')) {
+          const lantern = new BreakableObject(this, base + 425, 248, 'art_lantern', 1);
+          lantern.groundY = 280;
+          this.breakables.push(lantern);
+        }
+      }
+    } else {
 
     // Floor across full stage
     const floor = this.add.graphics();
@@ -221,6 +242,7 @@ export class StageScene extends Phaser.Scene {
     this.add.text(GAME_WIDTH / 2, STAGE_WALKABLE_Y_MIN - 15, `${stageConfig.nameZH} - ${stageConfig.name}`, {
       fontSize: '14px', color: '#888888', fontFamily: 'monospace',
     }).setOrigin(0.5).setDepth(-5).setScrollFactor(0);
+    }
 
     // Systems
     this.zDepthSorter = new ZDepthSorter();
@@ -396,6 +418,7 @@ export class StageScene extends Phaser.Scene {
     if (Phaser.Input.Keyboard.JustDown(this.keyDebug)) {
       this.showDebug = !this.showDebug;
       this.debugText.setVisible(this.showDebug);
+      for (const char of this.getAllCharacters()) char.setDebugLabelVisible(this.showDebug);
       if (this.showDebug) this.combatSystem.enableDebug();
     }
     this.updateDebugText();

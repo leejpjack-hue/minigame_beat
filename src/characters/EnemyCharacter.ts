@@ -3,6 +3,7 @@ import { CharacterState, CharacterStateType } from '../enums/CharacterState';
 import { FighterStats, DEFAULT_STATS } from './fighters/FighterStats';
 import { EnemyTypeDef, ENEMY_HITBOXES, EnemyTypeId } from './enemies/EnemyTypes';
 import { Direction } from '../enums/Direction';
+import { fitCharacterArt } from '../utils/CharacterArt';
 
 export class EnemyCharacter extends BaseCharacter {
   public aiType: string = 'normal';
@@ -119,5 +120,19 @@ export class EnemyCharacter extends BaseCharacter {
         }
       });
     }
+  }
+
+  protected updateVisuals(): void {
+    super.updateVisuals();
+    if (!fitCharacterArt(this.bodySprite, Math.round(this.stats.height * 1.65))) return;
+    const state = this.stateMachine.currentState;
+    const direction = this.facing === Direction.Right ? 1 : -1;
+    // Enemies originally had a single stance texture. Keep that contract while
+    // giving the new raster artwork a small, readable stride and attack lunge.
+    const stride = state === CharacterState.Walk ? Math.sin(this.scene.time.now / 85) : 0;
+    const attack = state === CharacterState.Attack
+      ? Math.sin(Math.min(1, this.attackFrame / Math.max(1, this.attackTotalFrames)) * Math.PI) : 0;
+    this.bodySprite.setPosition(direction * attack * 6, -Math.abs(stride) * 2);
+    this.bodySprite.setAngle(direction * (stride * 2 - attack * 7));
   }
 }

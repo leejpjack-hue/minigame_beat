@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { SceneKeys } from '../enums/SceneKeys';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config/constants';
 import { ALL_FIGHTERS } from '../characters/fighters';
+import { fitCharacterArt } from '../utils/CharacterArt';
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -102,7 +103,9 @@ export class MenuScene extends Phaser.Scene {
 
     const silhouette = this.add.image(startX, startY, tex);
     silhouette.setOrigin(0.5, 1);
-    silhouette.setFlipX(!isRightToLeft);
+    const silhouetteHeight = Math.round(fighter.height * 1.55);
+    fitCharacterArt(silhouette, silhouetteHeight);
+    silhouette.setFlipX(isRightToLeft);
     silhouette.setTint(0x0a001a); // Very dark, matching background
     silhouette.setAlpha(0.6);
     // Lower depth than UI text

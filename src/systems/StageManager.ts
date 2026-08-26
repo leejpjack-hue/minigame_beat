@@ -430,6 +430,10 @@ export class StageManager {
     const wave = this.config.waves[waveIndex];
     const baseX = waveIndex * this.sectionWidth;
 
+    this.scene.events.emit('round-started', {
+      stageIndex: Math.max(0, ALL_STAGES.indexOf(this.config)), waveIndex,
+    });
+
     this.scene.sound.play('ui_wave_start');
 
     // Banner: show named miniboss if present
@@ -464,7 +468,7 @@ export class StageManager {
 
       // Name tag for minibosses / bosses
       if (typeDef.id.startsWith('miniboss') || typeDef.id === 'boss' || typeDef.id === 'boss_lao') {
-        const h = typeDef.stats.height ?? 52;
+        const h = Math.round((typeDef.stats.height ?? 52) * 1.65);
         const tag = this.scene.add.text(0, -h - 18, typeDef.nameZH, {
           fontSize: '11px', fontFamily: 'monospace', color: '#ffaa88',
           stroke: '#000', strokeThickness: 2,

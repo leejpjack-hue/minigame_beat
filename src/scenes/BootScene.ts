@@ -3,6 +3,16 @@ import { SceneKeys } from '../enums/SceneKeys';
 import { SpriteGenerator } from '../utils/SpriteGenerator';
 import { FIGHTER_ART } from '../characters/fighters/FighterArtSpec';
 import { FighterName, FighterNameType } from '../enums/FighterName';
+import { ENEMY_TYPES, RASTER_ENEMY_SPRITES } from '../characters/enemies/EnemyTypes';
+import { BACKGROUND_ASSETS, backgroundKey } from '../config/RoundArt';
+
+const PLAYABLE_FIGHTER_ASSETS = [
+  { sprite: 'sprite_xiang_shao_long', file: 'xiang_shao_long' },
+  { sprite: 'sprite_lian_jin', file: 'lian_jin' },
+  { sprite: 'sprite_wu_ting_fang', file: 'wu_ting_fang' },
+  { sprite: 'sprite_shan_rou', file: 'shan_rou' },
+  { sprite: 'sprite_ying_zheng', file: 'ying_zheng' },
+] as const;
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -10,6 +20,27 @@ export class BootScene extends Phaser.Scene {
   }
 
   preload(): void {
+    for (const enemy of Object.values(ENEMY_TYPES)) {
+      if (RASTER_ENEMY_SPRITES.has(enemy.spriteKey)) {
+        this.load.image(enemy.spriteKey, `assets/enemies/${enemy.spriteKey}.png`);
+      }
+    }
+    for (const asset of BACKGROUND_ASSETS) {
+      this.load.image(backgroundKey(asset), `assets/backgrounds/${asset}.png`);
+    }
+    this.load.image('art_crate', 'assets/props/crate.png');
+    this.load.image('art_lantern', 'assets/props/lantern.png');
+
+    // HD pixel-art fighters. The base texture is the idle pose so
+    // character-select and any legacy consumers keep their existing keys.
+    for (const fighter of PLAYABLE_FIGHTER_ASSETS) {
+      const root = `assets/characters/${fighter.file}`;
+      this.load.image(fighter.sprite, `${root}_idle.png`);
+      this.load.image(`${fighter.sprite}_idle`, `${root}_idle.png`);
+      this.load.image(`${fighter.sprite}_walk`, `${root}_walk.png`);
+      this.load.image(`${fighter.sprite}_attack`, `${root}_attack.png`);
+    }
+
     // BGM
     this.load.audio('bgm_menu', 'assets/audio/bgm_menu.wav');
     this.load.audio('bgm_stage1', 'assets/audio/bgm_stage1.wav');
@@ -35,7 +66,7 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
-    // Generate 3 poses per fighter
+    // Generate procedural fallbacks only if a raster asset failed to load.
     const fighterKeys: { key: FighterNameType; sprite: string }[] = [
       { key: FighterName.XiangShaoLong, sprite: 'sprite_xiang_shao_long' },
       { key: FighterName.LianJin, sprite: 'sprite_lian_jin' },
@@ -46,9 +77,15 @@ export class BootScene extends Phaser.Scene {
 
     for (const f of fighterKeys) {
       const spec = FIGHTER_ART[f.key];
-      SpriteGenerator.generateFighter(this, f.sprite, spec, 'idle');
-      SpriteGenerator.generateFighter(this, f.sprite, spec, 'walk');
-      SpriteGenerator.generateFighter(this, f.sprite, spec, 'attack');
+      if (!this.textures.exists(`${f.sprite}_idle`)) {
+        SpriteGenerator.generateFighter(this, f.sprite, spec, 'idle');
+      }
+      if (!this.textures.exists(`${f.sprite}_walk`)) {
+        SpriteGenerator.generateFighter(this, f.sprite, spec, 'walk');
+      }
+      if (!this.textures.exists(`${f.sprite}_attack`)) {
+        SpriteGenerator.generateFighter(this, f.sprite, spec, 'attack');
+      }
       // Alias the base key (for scenes that load without explicit pose) to the idle pose
       if (!this.textures.exists(f.sprite)) {
         const src = this.textures.get(`${f.sprite}_idle`);
@@ -92,7 +129,7 @@ export class BootScene extends Phaser.Scene {
     // Legacy alias used by DEFAULT_STATS fallback
     if (!this.textures.exists('sprite_enemy')) {
       const src = this.textures.get('sprite_enemy_soldier');
-      if (src) this.textures.addCanvas('sprite_enemy', src.getSourceImage(0) as HTMLCanvasElement);
+      if (src) this.textures.addImage('sprite_enemy', src.getSourceImage(0) as HTMLImageElement);
     }
 
     // Shadow
