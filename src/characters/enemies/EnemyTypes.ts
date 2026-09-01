@@ -43,9 +43,8 @@ export interface EnemyTypeDef {
   color: { main: string; accent: string };
 }
 
-// Enemy sprites that ship as pre-rendered PNGs in public/assets/enemies/.
-// Everything else is generated procedurally in BootScene; requesting a
-// non-existent file would log a 404 on every boot.
+// Complete pre-rendered PNG roster in public/assets/enemies/. BootScene keeps
+// its procedural generator only as a resilient fallback if an asset fails.
 export const RASTER_ENEMY_SPRITES: ReadonlySet<string> = new Set([
   'sprite_enemy_soldier',
   'sprite_enemy_archer',
@@ -55,6 +54,20 @@ export const RASTER_ENEMY_SPRITES: ReadonlySet<string> = new Set([
   'sprite_enemy_elite',
   'sprite_enemy_assassin',
   'sprite_enemy_zhaoguard',
+  'sprite_enemy_qinguard',
+  'sprite_enemy_general',
+  'sprite_enemy_minilj',
+  'sprite_enemy_minitx',
+  'sprite_enemy_zhaomu',
+  'sprite_enemy_guokai',
+  'sprite_enemy_limu',
+  'sprite_enemy_lubuwei',
+  'sprite_enemy_chengjiao',
+  'sprite_enemy_jingke',
+  'sprite_enemy_fanyuqi',
+  'sprite_enemy_yandan',
+  'sprite_enemy_wangjian',
+  'sprite_boss_lao',
 ]);
 
 export const ENEMY_TYPES: Record<EnemyTypeId, EnemyTypeDef> = {

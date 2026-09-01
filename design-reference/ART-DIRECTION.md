@@ -21,11 +21,12 @@ and focus; `src/utils/RoundBackdrop.ts` crossfades when a wave starts).
   concept in `enemy-background-concepts/` is the style reference for that
   scene family; the concept itself contains mockup characters and HUD, so it
   was re-derived from the clean moon-gate master instead of cleaned.
-- Enemy raster art: the eight grunt types (soldier, archer, spearman,
-  shieldman, cavalry, elite, assassin, zhaoguard) ship as PNGs in
-  `public/assets/enemies/`; named minibosses and bosses stay procedural until
-  a later art pass. `RASTER_ENEMY_SPRITES` in `EnemyTypes.ts` lists which keys
-  have files so the boot loader never requests a missing PNG.
+- Enemy raster art: all 22 enemy types now ship as PNGs in
+  `public/assets/enemies/`. The original eight common units keep their approved
+  cute direction; Qin guards, the generic general, eleven named minibosses, and
+  Lao Ai now use detailed command-tier sprites instead of procedural fallback
+  art. `RASTER_ENEMY_SPRITES` in `EnemyTypes.ts` lists the complete roster so
+  every encounter loads the production artwork.
 - Props: `art_crate` and `art_lantern` breakables. The lantern is generated
   by the same variants script; both masters live in `design-reference/masters/props/`.
 - `scripts/build_character_manifest.py` records visible height, lower-body
@@ -80,6 +81,45 @@ watermark, checkerboard, ground shadow, extra fighter, or cropped body part.
 | Shan Rou / 善柔 | Black ponytail with green tie; forest-green tunic; black trousers; short silver dagger | Compact dagger-ready stance | Light rightward step, ponytail trailing | Low forward dagger lunge |
 | Ying Zheng / 嬴政 | Black hair; flat rectangular gold ceremonial crown and bead fringe; gold robe; red sash; black-and-gold lower garment; gold blade | Regal fighting stance | Measured rightward stride | Forward golden-blade attack, crown and outfit unchanged |
 
+## Command-tier enemy prompt set
+
+The senior and boss pass also used the **built-in Image Gen tool**. Each enemy
+was generated separately using the approved fighter and common-enemy sprites as
+style references, then mechanically chroma-keyed and aligned to a 96 × 112 RGBA
+canvas. No combat stats, hitboxes, names, weapons, or AI behavior changed.
+
+```text
+Use case: stylized-concept
+Asset type: single command-tier enemy sprite for a 2D beat-em-up game
+Primary request: create one detailed but cute full-body enemy, preserving the
+existing enemy type's palette, weapon, rank, and historical-fantasy identity.
+Style: HD pixel art; deliberate square pixel clusters; strong dark outline;
+three-step shading; expressive chibi face; detailed Warring States armour or robe.
+Composition: exactly one fighter facing right in a three-quarter combat stance;
+feet, crown or plume, hands, and the complete weapon inside the canvas with margin.
+Background: flat bright green chroma key; bright magenta for green-clad Fan Yuqi.
+Constraints: match the existing playable-character and common-enemy proportions;
+no scenery, text, name label, watermark, checkerboard, ground shadow, extra person,
+cropped weapon, or clipped body part.
+```
+
+| Texture | Identity and differentiating detail |
+| --- | --- |
+| `sprite_enemy_qinguard` | Compact elite Qin guard; navy-black and antique-gold lamellar, gold-rim helmet, straight sword |
+| `sprite_enemy_general` | Broad senior general; red-and-black ornate shoulder plates, topknot and plume, long sword |
+| `sprite_enemy_minilj` | Guan Zhongxie; sleek aubergine-black duelist, red trim, elegant topknot, thin sword, smug expression |
+| `sprite_enemy_minitx` | Tu Xian; sturdy red-and-black spear warrior, disciplined broad stance |
+| `sprite_enemy_zhaomu` | Zhao Mu; maroon-and-pale-gold noble armour and robe, ceremonial crown, elegant sword |
+| `sprite_enemy_guokai` | Guo Kai; brown-and-olive minister robes, sly expression, concealed poison dagger |
+| `sprite_enemy_limu` | Li Mu; deep-red legendary general, pale-gold armour detail, long spear, calm command |
+| `sprite_enemy_lubuwei` | Lu Buwei; stocky dark-brown chancellor, antique-gold court crown and royal blade |
+| `sprite_enemy_chengjiao` | Chengjiao; young blue-and-gold rebel prince, high topknot, straight sword |
+| `sprite_enemy_jingke` | Jing Ke; lean charcoal-and-violet prestige assassin, scarf and reverse-grip dagger |
+| `sprite_enemy_fanyuqi` | Fan Yuqi; broad olive-and-silver Yan general, rugged face, heavy long sword |
+| `sprite_enemy_yandan` | Prince Dan of Yan; refined blue-and-cyan prince, small crown, slim sword |
+| `sprite_enemy_wangjian` | Massive black-and-red veteran Qin general, red-plumed helmet, broad sword |
+| `sprite_boss_lao` | Lao Ai; largest purple-and-gold final boss, ornate crown, massive two-handed war hammer |
+
 ## Asset preparation and maintenance
 
 Python 3 with Pillow is needed only to rebuild assets/QA images; the game does
@@ -90,6 +130,7 @@ python3 scripts/prepare_character_sprite.py design-reference/masters/xiang_shao_
 # Use --key magenta for Shan Rou, then rebuild all alignment metadata:
 python3 scripts/build_character_manifest.py
 python3 scripts/render_character_art_qa.py
+python3 scripts/render_enemy_art_qa.py
 npm run test:art
 npm run build
 ```

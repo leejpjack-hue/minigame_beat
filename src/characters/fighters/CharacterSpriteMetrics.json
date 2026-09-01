@@ -139,6 +139,13 @@
     "canvasWidth": 96,
     "canvasHeight": 112
   },
+  "sprite_boss_lao": {
+    "artHeight": 97,
+    "originX": 0.40838,
+    "originY": 0.96429,
+    "canvasWidth": 96,
+    "canvasHeight": 112
+  },
   "sprite_enemy_archer": {
     "artHeight": 100,
     "originX": 0.41626,
@@ -160,9 +167,79 @@
     "canvasWidth": 96,
     "canvasHeight": 112
   },
+  "sprite_enemy_chengjiao": {
+    "artHeight": 86,
+    "originX": 0.36793,
+    "originY": 0.96429,
+    "canvasWidth": 96,
+    "canvasHeight": 112
+  },
   "sprite_enemy_elite": {
     "artHeight": 104,
     "originX": 0.38428,
+    "originY": 0.96429,
+    "canvasWidth": 96,
+    "canvasHeight": 112
+  },
+  "sprite_enemy_fanyuqi": {
+    "artHeight": 80,
+    "originX": 0.4064,
+    "originY": 0.96429,
+    "canvasWidth": 96,
+    "canvasHeight": 112
+  },
+  "sprite_enemy_general": {
+    "artHeight": 86,
+    "originX": 0.38922,
+    "originY": 0.96429,
+    "canvasWidth": 96,
+    "canvasHeight": 112
+  },
+  "sprite_enemy_guokai": {
+    "artHeight": 104,
+    "originX": 0.4648,
+    "originY": 0.96429,
+    "canvasWidth": 96,
+    "canvasHeight": 112
+  },
+  "sprite_enemy_jingke": {
+    "artHeight": 104,
+    "originX": 0.57028,
+    "originY": 0.96429,
+    "canvasWidth": 96,
+    "canvasHeight": 112
+  },
+  "sprite_enemy_limu": {
+    "artHeight": 103,
+    "originX": 0.45845,
+    "originY": 0.96429,
+    "canvasWidth": 96,
+    "canvasHeight": 112
+  },
+  "sprite_enemy_lubuwei": {
+    "artHeight": 79,
+    "originX": 0.3566,
+    "originY": 0.96429,
+    "canvasWidth": 96,
+    "canvasHeight": 112
+  },
+  "sprite_enemy_minilj": {
+    "artHeight": 104,
+    "originX": 0.32744,
+    "originY": 0.96429,
+    "canvasWidth": 96,
+    "canvasHeight": 112
+  },
+  "sprite_enemy_minitx": {
+    "artHeight": 83,
+    "originX": 0.37818,
+    "originY": 0.96429,
+    "canvasWidth": 96,
+    "canvasHeight": 112
+  },
+  "sprite_enemy_qinguard": {
+    "artHeight": 95,
+    "originX": 0.33797,
     "originY": 0.96429,
     "canvasWidth": 96,
     "canvasHeight": 112
@@ -188,9 +265,30 @@
     "canvasWidth": 96,
     "canvasHeight": 112
   },
+  "sprite_enemy_wangjian": {
+    "artHeight": 80,
+    "originX": 0.40769,
+    "originY": 0.96429,
+    "canvasWidth": 96,
+    "canvasHeight": 112
+  },
+  "sprite_enemy_yandan": {
+    "artHeight": 96,
+    "originX": 0.33735,
+    "originY": 0.96429,
+    "canvasWidth": 96,
+    "canvasHeight": 112
+  },
   "sprite_enemy_zhaoguard": {
     "artHeight": 102,
     "originX": 0.37403,
+    "originY": 0.96429,
+    "canvasWidth": 96,
+    "canvasHeight": 112
+  },
+  "sprite_enemy_zhaomu": {
+    "artHeight": 103,
+    "originX": 0.35834,
     "originY": 0.96429,
     "canvasWidth": 96,
     "canvasHeight": 112
